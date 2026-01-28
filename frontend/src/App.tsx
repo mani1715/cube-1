@@ -61,16 +61,17 @@ const App = () => (
             {/* Protected Admin Routes */}
             <Route element={<AdminProtectedRoute />}>
               <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="sessions" element={<AdminSessions />} />
-                <Route path="events" element={<AdminEvents />} />
-                <Route path="blogs" element={<AdminBlogs />} />
-                <Route path="psychologists" element={<AdminPsychologists />} />
-                <Route path="volunteers" element={<AdminVolunteers />} />
-                <Route path="jobs" element={<AdminJobs />} />
-                <Route path="contacts" element={<AdminContacts />} />
-                <Route path="logs" element={<AdminLogs />} />
-                <Route path="settings" element={<AdminSettings />} />
+                <Route index element={<ErrorBoundary><AdminDashboard /></ErrorBoundary>} />
+                <Route path="sessions" element={<ErrorBoundary><AdminSessions /></ErrorBoundary>} />
+                <Route path="events" element={<ErrorBoundary><AdminEvents /></ErrorBoundary>} />
+                <Route path="blogs" element={<ErrorBoundary><AdminBlogs /></ErrorBoundary>} />
+                <Route path="psychologists" element={<ErrorBoundary><AdminPsychologists /></ErrorBoundary>} />
+                <Route path="volunteers" element={<ErrorBoundary><AdminVolunteers /></ErrorBoundary>} />
+                <Route path="jobs" element={<ErrorBoundary><AdminJobs /></ErrorBoundary>} />
+                <Route path="contacts" element={<ErrorBoundary><AdminContacts /></ErrorBoundary>} />
+                <Route path="logs" element={<ErrorBoundary><AdminLogs /></ErrorBoundary>} />
+                <Route path="errors" element={<ErrorBoundary><AdminErrors /></ErrorBoundary>} />
+                <Route path="settings" element={<ErrorBoundary><AdminSettings /></ErrorBoundary>} />
               </Route>
             </Route>
             
