@@ -1,5 +1,5 @@
 """Bulk operations for admin panel"""
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks, Request
 from typing import List, Dict, Any
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
@@ -10,6 +10,8 @@ from .auth import get_current_admin
 from .schemas import Admin
 from .permissions import require_delete_permission, require_admin_or_above
 from .utils import log_admin_action
+from .rate_limits import limiter, ADMIN_RATE_LIMIT, EXPORT_RATE_LIMIT
+from .background_tasks import AuditExportService, BulkOperationsService
 
 logger = logging.getLogger(__name__)
 
