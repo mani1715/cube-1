@@ -33,14 +33,19 @@ const AdminNavbar = () => {
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-6">
         {/* Page Title */}
-        <div>
+        <div className="flex-shrink-0">
           <h2 className="text-xl font-semibold text-gray-800">Admin Panel</h2>
         </div>
 
+        {/* Global Search - Center */}
+        <div className="flex-1 max-w-2xl">
+          <GlobalSearch />
+        </div>
+
         {/* Right side actions */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-shrink-0">
           {/* Notifications */}
           <button 
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors relative"
