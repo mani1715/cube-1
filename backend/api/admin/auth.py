@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import bcrypt
 from jose import JWTError, jwt
@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 from .schemas import AdminLogin, AdminToken, Admin, RefreshToken
+from .rate_limits import limiter, AUTH_RATE_LIMIT
 
 ROOT_DIR = Path(__file__).parent.parent.parent
 load_dotenv(ROOT_DIR / '.env')
