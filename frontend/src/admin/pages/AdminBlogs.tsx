@@ -49,6 +49,7 @@ const AdminBlogs = () => {
   });
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAIAssistant, setShowAIAssistant] = useState<boolean>(false);
 
   const fetchBlogs = async () => {
     try {
