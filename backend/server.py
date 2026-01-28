@@ -433,6 +433,9 @@ from api.admin.search import search_router
 from api.admin.error_tracking import error_router
 from api.admin.phase7_router import phase7_router  # Phase 7.1 - Security & Compliance
 from api.admin.phase8_router import router as phase8_router  # Phase 8.1A - AI & Automation
+from api.phase9_production import phase9_prod_router  # Phase 9.1 - Production
+from api.phase9_seo import phase9_seo_router  # Phase 9.2 - SEO
+from api.phase9_compliance import phase9_compliance_router  # Phase 9.5 - Compliance
 app.include_router(admin_router)
 app.include_router(auth_router)
 app.include_router(bulk_router)
@@ -440,6 +443,9 @@ app.include_router(search_router)
 app.include_router(error_router)
 app.include_router(phase7_router)  # Phase 7.1 routes
 app.include_router(phase8_router)  # Phase 8.1A routes
+app.include_router(phase9_prod_router)  # Phase 9.1 routes
+app.include_router(phase9_seo_router)  # Phase 9.2 routes
+app.include_router(phase9_compliance_router)  # Phase 9.5 routes
 
 # Mount static files for uploads
 from fastapi.staticfiles import StaticFiles
