@@ -534,6 +534,75 @@ export const adminErrorAPI = {
   },
 };
 
+// Phase 8 - AI Blog Assistant API
+export const adminAIAPI = {
+  generateBlogDraft: async (data: {
+    topic: string;
+    keywords?: string[];
+    tone?: string;
+    length?: string;
+  }) => {
+    return await adminApiRequest('/api/admin/phase8/ai/blog/draft', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  improveContent: async (data: {
+    content: string;
+    improvement_type?: string;
+  }) => {
+    return await adminApiRequest('/api/admin/phase8/ai/blog/improve', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  suggestTags: async (data: {
+    title: string;
+    content: string;
+  }) => {
+    return await adminApiRequest('/api/admin/phase8/ai/blog/suggest-tags', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  suggestTitles: async (data: {
+    content: string;
+    count?: number;
+  }) => {
+    return await adminApiRequest('/api/admin/phase8/ai/blog/suggest-titles', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  generateSummary: async (data: {
+    content: string;
+    max_length?: number;
+  }) => {
+    return await adminApiRequest('/api/admin/phase8/ai/blog/generate-summary', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  qualityCheck: async (data: {
+    title: string;
+    content: string;
+  }) => {
+    return await adminApiRequest('/api/admin/phase8/ai/blog/quality-check', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  getAIStatus: async () => {
+    return await adminApiRequest('/api/admin/phase8/ai/status');
+  },
+};
+
 // Default export combining all APIs
 export default {
   ...adminAuthAPI,
