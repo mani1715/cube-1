@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { adminBlogsAPI } from '@/lib/adminApi';
 import { TableSkeleton } from '@/components/ui/loading-skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
-import { FileText, Plus } from 'lucide-react';
+import { FileText, Plus, Wand2 } from 'lucide-react';
+import { AIBlogAssistant } from '../components/AIBlogAssistant';
 
 interface Blog {
   id: string;
