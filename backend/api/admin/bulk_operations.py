@@ -36,13 +36,16 @@ ENTITY_COLLECTIONS = {
 
 
 @bulk_router.post("/delete")
+@limiter.limit(ADMIN_RATE_LIMIT)
 async def bulk_delete(
+    request: Request,
     entity: str,
     ids: List[str],
+    background_tasks: BackgroundTasks,
     current_admin: Admin = Depends(require_delete_permission)
 ) -> Dict[str, Any]:
     """
-    Bulk delete items from specified entity
+    Bulk delete items from specified entity (background processing for large operations)
     
     Args:
         entity: Entity type (sessions, events, blogs, etc.)
@@ -56,6 +59,36 @@ async def bulk_delete(
         raise HTTPException(status_code=400, detail=f"Invalid entity type: {entity}")
     
     collection_name = ENTITY_COLLECTIONS[entity]
+    
+    # If large bulk operation, process in background
+    if len(ids) > 100:
+        background_tasks.add_task(
+            BulkOperationsService.bulk_delete,
+            collection=collection_name,
+            ids=ids,
+            admin_email=current_admin.email
+        )
+        
+        await log_admin_action(
+            admin_id=current_admin.id,
+            admin_email=current_admin.email,
+            action="bulk_delete_started",
+            entity=entity,
+            entity_id=",".join(ids[:5]),
+            details=f"Started background bulk delete for {len(ids)} {entity} items"
+        )
+        
+        logger.info(f"Admin {current_admin.email} started background bulk delete for {len(ids)} {entity} items")
+        
+        return {
+            "success": True,
+            "processing": "background",
+            "count": len(ids),
+            "entity": entity,
+            "message": f"Bulk delete of {len(ids)} items started in background. You will receive an email when complete."
+        }
+    
+    # For smaller operations, process immediately
     collection = db[collection_name]
     
     try:
