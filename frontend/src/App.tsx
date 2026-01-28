@@ -60,6 +60,8 @@ const App = () => (
               <Route path="/volunteer" element={<Volunteer />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/data-export" element={<DataExport />} />
+              <Route path="/account-deletion" element={<AccountDeletion />} />
             
             {/* Admin Login Route (Public) */}
             <Route path="/admin/login" element={<AdminLogin />} />
