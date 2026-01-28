@@ -10,9 +10,11 @@ from .permissions import get_current_admin, require_admin_or_above
 from .phase8_ai import ai_assistant
 from .phase8_notifications import notification_engine
 from .phase8_workflows import workflow_engine
+from .phase8_analytics import analytics_engine
 from .utils import log_admin_action
 import os
 from pymongo import MongoClient
+from fastapi.responses import Response
 
 # MongoDB connection
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
