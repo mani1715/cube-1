@@ -144,7 +144,8 @@ async def get_event(event_id: str):
 
 
 @api_router.post("/events/{event_id}/register", response_model=EventRegistration, status_code=status.HTTP_201_CREATED)
-async def register_for_event(event_id: str, full_name: str, email: str, phone: Optional[str] = None):
+@limiter.limit(PUBLIC_RATE_LIMIT)
+async def register_for_event(request: Request, event_id: str, full_name: str, email: str, phone: Optional[str] = None, background_tasks: BackgroundTasks = None):
     """Register for an event"""
     try:
         # Check if event exists
@@ -160,6 +161,15 @@ async def register_for_event(event_id: str, full_name: str, email: str, phone: O
         )
         await db.event_registrations.insert_one(registration.dict())
         logger.info(f"New event registration: {registration.id}")
+        
+        # Send confirmation email in background
+        if background_tasks:
+            background_tasks.add_task(
+                EmailService.send_event_registration,
+                to_email=email,
+                event_data=Event(**event).dict()
+            )
+        
         return registration
     except HTTPException:
         raise
