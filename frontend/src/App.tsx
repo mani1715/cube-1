@@ -16,6 +16,8 @@ import PsychologistPortal from "./pages/PsychologistPortal";
 import Volunteer from "./pages/Volunteer";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
+import DataExport from "./pages/DataExport";
+import AccountDeletion from "./pages/AccountDeletion";
 import NotFound from "./pages/NotFound";
 // Admin imports
 import { AdminProvider } from "./contexts/AdminContext";
