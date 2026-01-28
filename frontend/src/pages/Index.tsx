@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ArrowRight, Users, Calendar, BookOpen, Shield, Sparkles, Heart } from "lucide-react";
 import heroBg from "@/assets/bg-home-hero.jpg";
+import SEO from "@/components/SEO";
 
 const features = [
   {
