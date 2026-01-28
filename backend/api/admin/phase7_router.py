@@ -11,7 +11,7 @@ This router provides endpoints for:
 7. GDPR compliance (data export, purge)
 """
 
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks, status
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks, status, Request
 from fastapi.security import HTTPAuthorizationCredentials
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any
