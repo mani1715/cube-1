@@ -331,6 +331,27 @@ async def get_ai_status(admin: dict = Depends(get_current_admin)):
         feature_toggle = db.feature_toggles.find_one({"name": "ai_assistance"})
         is_enabled = feature_toggle["enabled"] if feature_toggle else True
         
+        return {
+            "success": True,
+            "data": {
+                "ai_configured": is_configured,
+                "ai_enabled": is_enabled,
+                "provider": "OpenAI",
+                "model": "gpt-4o-mini",
+                "features": [
+                    "blog_draft_generation",
+                    "content_improvement",
+                    "tag_suggestion",
+                    "title_suggestion",
+                    "summary_generation",
+                    "quality_check"
+                ]
+            },
+            "message": "AI status retrieved successfully"
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get AI status: {str(e)}")
 
 
 # ==========================================
