@@ -56,7 +56,6 @@ phase7_router = APIRouter(prefix="/api/admin/security", tags=["Phase 7 - Securit
 @limiter.limit(ADMIN_RATE_LIMIT)
 async def soft_delete_entity(
     request: Request,
-    request: Request,
     entity: str,
     entity_id: str,
     credentials: HTTPAuthorizationCredentials = Depends(security),
