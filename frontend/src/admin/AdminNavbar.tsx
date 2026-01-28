@@ -2,6 +2,7 @@ import { Bell, User, LogOut, Shield, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '../contexts/AdminContext';
 import { toast } from '../lib/toast';
+import GlobalSearch from './components/GlobalSearch';
 
 const AdminNavbar = () => {
   const navigate = useNavigate();
