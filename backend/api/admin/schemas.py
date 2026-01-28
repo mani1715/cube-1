@@ -27,6 +27,10 @@ class Admin(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     is_active: bool = True
     last_login: datetime = Field(default_factory=datetime.utcnow)
+    # Phase 7.1 - Security enhancements
+    password_changed_at: datetime = Field(default_factory=datetime.utcnow)
+    two_factor_enabled: bool = False
+    two_factor_secret: str = ""  # For future TOTP implementation
 
 
 class AdminCreate(BaseModel):
