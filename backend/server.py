@@ -110,7 +110,8 @@ async def update_session_status(request: Request, session_id: str, new_status: s
 
 # ============= EVENT ENDPOINTS =============
 @api_router.post("/events", response_model=Event, status_code=status.HTTP_201_CREATED)
-async def create_event(event: EventCreate):
+@limiter.limit(PUBLIC_RATE_LIMIT)
+async def create_event(request: Request, event: EventCreate):
     """Create a new event"""
     try:
         event_obj = Event(**event.dict())
@@ -123,7 +124,8 @@ async def create_event(event: EventCreate):
 
 
 @api_router.get("/events", response_model=List[Event])
-async def get_all_events(is_active: Optional[bool] = None):
+@limiter.limit(PUBLIC_RATE_LIMIT)
+async def get_all_events(request: Request, is_active: Optional[bool] = None):
     """Get all events with optional active filter"""
     try:
         query = {"is_active": is_active} if is_active is not None else {}
@@ -135,7 +137,8 @@ async def get_all_events(is_active: Optional[bool] = None):
 
 
 @api_router.get("/events/{event_id}", response_model=Event)
-async def get_event(event_id: str):
+@limiter.limit(PUBLIC_RATE_LIMIT)
+async def get_event(request: Request, event_id: str):
     """Get a specific event"""
     event = await db.events.find_one({"id": event_id})
     if not event:
