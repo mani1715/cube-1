@@ -591,22 +591,17 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Admin File Upload Endpoint"
-    - "Session CRUD Endpoints"
-    - "Event CRUD Endpoints"
-    - "Blog CRUD Endpoints"
-    - "Psychologist CRUD Endpoints"
-    - "Job CRUD Endpoints"
-    - "Volunteer CRUD Endpoints"
-    - "Contact CRUD Endpoints"
-    - "Settings Update Endpoint"
-    - "Static File Serving"
+    - "Background Job System - Email Service (Mock)"
+    - "Background Job System - Audit Export Service"
+    - "Background Job System - Bulk Operations Service"
+    - "Rate Limiting - Public APIs"
+    - "Rate Limiting - Auth APIs"
+    - "Rate Limiting - Admin Bulk Operations"
+    - "Enhanced Bulk Operations with Background Processing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "Phase 4 Stage 1 COMPLETE: Added all missing CRUD endpoints for admin panel. Implemented: 1) File upload endpoint with validation (5MB, image types only), 2) CREATE endpoints for Sessions, Events, Blogs, Psychologists, Jobs, 3) UPDATE endpoints for all entities including Volunteers and Contacts, 4) DELETE endpoints for Psychologists, Jobs, Volunteers, Contacts with super_admin permission enforcement, 5) Settings update endpoint with super_admin permission, 6) Static file serving mounted at /static. All endpoints include activity logging. Ready for backend testing."
-  - agent: "main"
-    message: "Phase 4 Stage 2 STARTING: Now testing all backend CRUD endpoints (Sessions, Events, Blogs, Psychologists, Jobs, Volunteers, Contacts, Settings, File Upload). Will verify pagination, filtering, and all CRUD operations work correctly."
+    message: "Phase 6.1 COMPLETE: System Stability & Background Processing implemented. Added: 1) Background job system using FastAPI BackgroundTasks - mock email service for session/event/volunteer/contact confirmations, audit log export to CSV, bulk operations processing. 2) Rate limiting using SlowAPI - public APIs: 10/min, admin APIs: 60/min, auth APIs: 5/min (brute-force protection), export APIs: 5/min. 3) Enhanced bulk operations with smart threshold (>100 items → background processing). 4) All background jobs send completion emails (mocked). 5) Rate limit responses return 429 status. Ready for backend testing of rate limits and background jobs."
