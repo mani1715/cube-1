@@ -420,8 +420,22 @@ export const adminFileAPI = {
   },
 
   deleteError: async (errorId: string) => {
-    return await adminApiRequest(`/api/admin/errors/${errorId}`, {
+    return await adminApiRequest(`/app/admin/errors/${errorId}`, {
       method: 'DELETE',
     });
   },
+};
+
+// Default export combining all APIs
+export default {
+  ...adminAuthAPI,
+  ...adminSessionsAPI,
+  ...adminEventsAPI,
+  ...adminBlogsAPI,
+  ...adminPsychologistsAPI,
+  ...adminVolunteersAPI,
+  ...adminJobsAPI,
+  ...adminContactsAPI,
+  ...adminLogsAPI,
+  ...adminAPI,
 };
