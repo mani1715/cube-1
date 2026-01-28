@@ -694,6 +694,7 @@ async def get_retention_policies(
 @phase7_router.delete("/gdpr/{entity}/{entity_id}/purge")
 @limiter.limit("5/minute")  # Stricter limit for destructive actions
 async def purge_entity(
+    request: Request,
     entity: str,
     entity_id: str,
     credentials: HTTPAuthorizationCredentials = Depends(security),
