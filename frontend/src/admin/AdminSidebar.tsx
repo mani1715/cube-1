@@ -8,6 +8,7 @@ import {
   UserPlus, 
   Briefcase, 
   MessageSquare,
+  AlertTriangle,
   Settings 
 } from 'lucide-react';
 
