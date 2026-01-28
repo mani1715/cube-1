@@ -460,7 +460,8 @@ export const adminFileAPI = {
 // Alias for compatibility
 export const adminFileUploadAPI = adminFileAPI;
 
-  // Bulk Operations
+// Admin Bulk Operations API
+export const adminBulkAPI = {
   bulkDelete: async (entity: string, ids: string[]) => {
     return await adminApiRequest('/api/admin/bulk/delete', {
       method: 'POST',
@@ -476,13 +477,14 @@ export const adminFileUploadAPI = adminFileAPI;
     return data;
   },
 
-  // Global Search
   globalSearch: async (query: string, limit: number = 20) => {
     const params = new URLSearchParams({ q: query, limit: limit.toString() });
     return await adminApiRequest(`/api/admin/search/global?${params.toString()}`);
   },
+};
 
-  // Error Tracking
+// Admin Error Tracking API
+export const adminErrorAPI = {
   logError: async (errorData: {
     error_type: string;
     severity: string;
@@ -526,7 +528,7 @@ export const adminFileUploadAPI = adminFileAPI;
   },
 
   deleteError: async (errorId: string) => {
-    return await adminApiRequest(`/app/admin/errors/${errorId}`, {
+    return await adminApiRequest(`/api/admin/errors/${errorId}`, {
       method: 'DELETE',
     });
   },
