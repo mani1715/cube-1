@@ -87,10 +87,20 @@ const AdminBlogs = () => {
           <h1 className="text-3xl font-bold text-gray-900">Blogs Management</h1>
           <p className="text-gray-600 mt-2">Create and manage blog posts</p>
         </div>
-        <Button className="flex items-center gap-2">
-          <Plus className="w-4 h-4" />
-          Create Blog
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+            onClick={() => setShowAIAssistant(true)}
+          >
+            <Wand2 className="w-4 h-4" />
+            AI Assistant
+          </Button>
+          <Button className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            Create Blog
+          </Button>
+        </div>
       </div>
 
       {/* Stats Grid */}
