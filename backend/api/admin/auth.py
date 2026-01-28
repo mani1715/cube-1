@@ -164,7 +164,8 @@ async def get_current_admin(credentials: HTTPAuthorizationCredentials = Depends(
 
 # Refresh token endpoint
 @auth_router.post("/refresh", response_model=AdminToken)
-async def refresh_access_token(refresh_token: str):
+@limiter.limit(AUTH_RATE_LIMIT)
+async def refresh_access_token(request: Request, refresh_token: str):
     """Refresh access token using refresh token"""
     email = await verify_refresh_token(refresh_token)
     
