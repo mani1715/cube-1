@@ -1001,3 +1001,256 @@ async def get_workflow_types(admin: dict = Depends(require_admin_or_above)):
             "step_status": workflow_engine.STEP_STATUS
         }
     }
+
+
+
+# ==========================================
+# ANALYTICS ENDPOINTS (Phase 8.1B)
+# ==========================================
+
+@router.get("/analytics/dashboard")
+async def get_analytics_dashboard(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Get comprehensive analytics dashboard
+    
+    - **start_date**: Start date (ISO format, optional)
+    - **end_date**: End date (ISO format, optional)
+    
+    Returns overview of all key metrics
+    """
+    try:
+        from datetime import datetime
+        
+        # Parse dates if provided
+        start = datetime.fromisoformat(start_date) if start_date else None
+        end = datetime.fromisoformat(end_date) if end_date else None
+        
+        dashboard = await analytics_engine.get_dashboard_overview(start, end)
+        
+        return {
+            "success": True,
+            "data": dashboard
+        }
+    
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid date format: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch dashboard: {str(e)}")
+
+
+@router.get("/analytics/sessions")
+async def get_session_analytics(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Get session booking analytics
+    
+    - **start_date**: Start date (ISO format, optional)
+    - **end_date**: End date (ISO format, optional)
+    
+    Returns session trends, status breakdown, and key metrics
+    """
+    try:
+        from datetime import datetime
+        
+        start = datetime.fromisoformat(start_date) if start_date else None
+        end = datetime.fromisoformat(end_date) if end_date else None
+        
+        analytics = await analytics_engine.get_session_analytics(start, end)
+        
+        return {
+            "success": True,
+            "data": analytics
+        }
+    
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid date format: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch session analytics: {str(e)}")
+
+
+@router.get("/analytics/events")
+async def get_event_analytics(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Get event analytics
+    
+    - **start_date**: Start date (ISO format, optional)
+    - **end_date**: End date (ISO format, optional)
+    
+    Returns event trends, registrations, and top events
+    """
+    try:
+        from datetime import datetime
+        
+        start = datetime.fromisoformat(start_date) if start_date else None
+        end = datetime.fromisoformat(end_date) if end_date else None
+        
+        analytics = await analytics_engine.get_event_analytics(start, end)
+        
+        return {
+            "success": True,
+            "data": analytics
+        }
+    
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid date format: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch event analytics: {str(e)}")
+
+
+@router.get("/analytics/blogs")
+async def get_blog_analytics(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Get blog engagement analytics
+    
+    - **start_date**: Start date (ISO format, optional)
+    - **end_date**: End date (ISO format, optional)
+    
+    Returns blog metrics, category breakdown, and recent posts
+    """
+    try:
+        from datetime import datetime
+        
+        start = datetime.fromisoformat(start_date) if start_date else None
+        end = datetime.fromisoformat(end_date) if end_date else None
+        
+        analytics = await analytics_engine.get_blog_analytics(start, end)
+        
+        return {
+            "success": True,
+            "data": analytics
+        }
+    
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid date format: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch blog analytics: {str(e)}")
+
+
+@router.get("/analytics/volunteers")
+async def get_volunteer_analytics(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Get volunteer application analytics
+    
+    - **start_date**: Start date (ISO format, optional)
+    - **end_date**: End date (ISO format, optional)
+    
+    Returns volunteer application trends and status breakdown
+    """
+    try:
+        from datetime import datetime
+        
+        start = datetime.fromisoformat(start_date) if start_date else None
+        end = datetime.fromisoformat(end_date) if end_date else None
+        
+        analytics = await analytics_engine.get_volunteer_analytics(start, end)
+        
+        return {
+            "success": True,
+            "data": analytics
+        }
+    
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid date format: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch volunteer analytics: {str(e)}")
+
+
+@router.get("/analytics/contacts")
+async def get_contact_analytics(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Get contact form analytics
+    
+    - **start_date**: Start date (ISO format, optional)
+    - **end_date**: End date (ISO format, optional)
+    
+    Returns contact metrics and response rate
+    """
+    try:
+        from datetime import datetime
+        
+        start = datetime.fromisoformat(start_date) if start_date else None
+        end = datetime.fromisoformat(end_date) if end_date else None
+        
+        analytics = await analytics_engine.get_contact_analytics(start, end)
+        
+        return {
+            "success": True,
+            "data": analytics
+        }
+    
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid date format: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch contact analytics: {str(e)}")
+
+
+@router.get("/analytics/export/{data_type}")
+async def export_analytics_csv(
+    data_type: str,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Export analytics data as CSV
+    
+    - **data_type**: Type of data to export (sessions, events, blogs, volunteers, contacts)
+    - **start_date**: Start date (ISO format, optional)
+    - **end_date**: End date (ISO format, optional)
+    
+    Returns CSV file for download
+    """
+    try:
+        from datetime import datetime
+        
+        start = datetime.fromisoformat(start_date) if start_date else None
+        end = datetime.fromisoformat(end_date) if end_date else None
+        
+        csv_content = await analytics_engine.export_analytics_csv(data_type, start, end)
+        
+        await log_admin_action(
+            admin_id=admin["id"],
+            admin_email=admin["email"],
+            action="analytics_export",
+            entity="analytics",
+            entity_id=None,
+            details={"data_type": data_type}
+        )
+        
+        # Return CSV file
+        return Response(
+            content=csv_content,
+            media_type="text/csv",
+            headers={
+                "Content-Disposition": f"attachment; filename={data_type}_export.csv"
+            }
+        )
+    
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to export analytics: {str(e)}")
+
