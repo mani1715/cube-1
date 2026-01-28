@@ -252,6 +252,18 @@ const AdminBlogs = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* AI Blog Assistant Modal */}
+      <AIBlogAssistant
+        open={showAIAssistant}
+        onClose={() => setShowAIAssistant(false)}
+        onApply={(data) => {
+          console.log('AI Generated Data:', data);
+          // Here you would typically populate a create/edit form
+          // For now, just close the modal
+          setShowAIAssistant(false);
+        }}
+      />
     </div>
   );
 };
