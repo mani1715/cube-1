@@ -619,3 +619,383 @@ async def get_trigger_events(admin: dict = Depends(require_admin_or_above)):
             "rule_types": notification_engine.RULE_TYPES
         }
     }
+
+
+# ==========================================
+# WORKFLOW AUTOMATION ENDPOINTS
+# ==========================================
+
+class WorkflowCreate(BaseModel):
+    name: str = Field(..., description="Workflow name")
+    description: str = Field(..., description="Workflow description")
+    workflow_type: str = Field(..., description="Workflow type")
+    steps: List[Dict[str, Any]] = Field(..., description="Workflow steps")
+    config: Dict[str, Any] = Field(default_factory=dict, description="Workflow configuration")
+
+
+class WorkflowUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    enabled: Optional[bool] = None
+    steps: Optional[List[Dict[str, Any]]] = None
+    config: Optional[Dict[str, Any]] = None
+
+
+class WorkflowExecuteRequest(BaseModel):
+    input_data: Dict[str, Any] = Field(default_factory=dict, description="Input data for workflow")
+
+
+@router.get("/workflows")
+async def get_workflows(
+    workflow_type: Optional[str] = None,
+    enabled: Optional[bool] = None,
+    page: int = 1,
+    limit: int = 50,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Get all workflow templates
+    
+    - **workflow_type**: Filter by type (content_review, bulk_approval, data_cleanup, etc.)
+    - **enabled**: Filter by enabled status
+    - **page**: Page number
+    - **limit**: Items per page
+    """
+    try:
+        skip = (page - 1) * limit
+        result = await workflow_engine.get_workflows(
+            workflow_type=workflow_type,
+            enabled=enabled,
+            skip=skip,
+            limit=limit
+        )
+        
+        return {
+            "success": True,
+            "data": result["workflows"],
+            "pagination": {
+                "total": result["total"],
+                "page": page,
+                "limit": limit,
+                "pages": (result["total"] + limit - 1) // limit
+            }
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch workflows: {str(e)}")
+
+
+@router.post("/workflows")
+async def create_workflow(
+    request: WorkflowCreate,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Create a new workflow template
+    
+    - **name**: Workflow name
+    - **description**: Workflow description
+    - **workflow_type**: Type of workflow
+    - **steps**: List of workflow steps
+    - **config**: Workflow configuration
+    """
+    try:
+        workflow = await workflow_engine.create_workflow(
+            name=request.name,
+            description=request.description,
+            workflow_type=request.workflow_type,
+            steps=request.steps,
+            config=request.config,
+            created_by=admin["id"]
+        )
+        
+        await log_admin_action(
+            admin_id=admin["id"],
+            admin_email=admin["email"],
+            action="workflow_created",
+            entity="workflow",
+            entity_id=workflow["id"],
+            details={"name": workflow["name"], "type": workflow["workflow_type"]}
+        )
+        
+        return {
+            "success": True,
+            "data": workflow,
+            "message": "Workflow created successfully"
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create workflow: {str(e)}")
+
+
+@router.put("/workflows/{workflow_id}")
+async def update_workflow(
+    workflow_id: str,
+    request: WorkflowUpdate,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Update a workflow template
+    
+    - **workflow_id**: ID of the workflow to update
+    """
+    try:
+        updates = {k: v for k, v in request.dict().items() if v is not None}
+        
+        if not updates:
+            raise HTTPException(status_code=400, detail="No fields to update")
+        
+        updated_workflow = await workflow_engine.update_workflow(workflow_id, updates)
+        
+        await log_admin_action(
+            admin_id=admin["id"],
+            admin_email=admin["email"],
+            action="workflow_updated",
+            entity="workflow",
+            entity_id=workflow_id,
+            details=updates
+        )
+        
+        return {
+            "success": True,
+            "data": updated_workflow,
+            "message": "Workflow updated successfully"
+        }
+    
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update workflow: {str(e)}")
+
+
+@router.delete("/workflows/{workflow_id}")
+async def delete_workflow(
+    workflow_id: str,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Delete a workflow template
+    
+    - **workflow_id**: ID of the workflow to delete
+    """
+    try:
+        deleted = await workflow_engine.delete_workflow(workflow_id)
+        
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Workflow not found")
+        
+        await log_admin_action(
+            admin_id=admin["id"],
+            admin_email=admin["email"],
+            action="workflow_deleted",
+            entity="workflow",
+            entity_id=workflow_id,
+            details={}
+        )
+        
+        return {
+            "success": True,
+            "message": "Workflow deleted successfully"
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete workflow: {str(e)}")
+
+
+@router.post("/workflows/{workflow_id}/execute")
+async def execute_workflow(
+    workflow_id: str,
+    request: WorkflowExecuteRequest,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Execute a workflow manually
+    
+    - **workflow_id**: ID of the workflow to execute
+    - **input_data**: Optional input data for the workflow
+    """
+    try:
+        execution = await workflow_engine.execute_workflow(
+            workflow_id=workflow_id,
+            triggered_by=admin["id"],
+            input_data=request.input_data
+        )
+        
+        await log_admin_action(
+            admin_id=admin["id"],
+            admin_email=admin["email"],
+            action="workflow_executed",
+            entity="workflow",
+            entity_id=workflow_id,
+            details={
+                "execution_id": execution["id"],
+                "status": execution["status"],
+                "steps_completed": execution["steps_completed"]
+            }
+        )
+        
+        return {
+            "success": True,
+            "data": execution,
+            "message": f"Workflow execution {execution['status']}"
+        }
+    
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to execute workflow: {str(e)}")
+
+
+@router.get("/workflows/{workflow_id}/executions")
+async def get_workflow_executions(
+    workflow_id: str,
+    status: Optional[str] = None,
+    page: int = 1,
+    limit: int = 50,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Get execution history for a specific workflow
+    
+    - **workflow_id**: ID of the workflow
+    - **status**: Filter by status (pending, in_progress, completed, failed, cancelled)
+    - **page**: Page number
+    - **limit**: Items per page
+    """
+    try:
+        skip = (page - 1) * limit
+        result = await workflow_engine.get_executions(
+            workflow_id=workflow_id,
+            status=status,
+            skip=skip,
+            limit=limit
+        )
+        
+        return {
+            "success": True,
+            "data": result["executions"],
+            "pagination": {
+                "total": result["total"],
+                "page": page,
+                "limit": limit,
+                "pages": (result["total"] + limit - 1) // limit
+            }
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch executions: {str(e)}")
+
+
+@router.get("/workflows/executions/all")
+async def get_all_executions(
+    status: Optional[str] = None,
+    page: int = 1,
+    limit: int = 50,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Get all workflow executions across all workflows
+    
+    - **status**: Filter by status
+    - **page**: Page number
+    - **limit**: Items per page
+    """
+    try:
+        skip = (page - 1) * limit
+        result = await workflow_engine.get_executions(
+            status=status,
+            skip=skip,
+            limit=limit
+        )
+        
+        return {
+            "success": True,
+            "data": result["executions"],
+            "pagination": {
+                "total": result["total"],
+                "page": page,
+                "limit": limit,
+                "pages": (result["total"] + limit - 1) // limit
+            }
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch executions: {str(e)}")
+
+
+@router.get("/workflows/executions/{execution_id}")
+async def get_execution_details(
+    execution_id: str,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Get detailed information about a workflow execution
+    
+    - **execution_id**: ID of the execution
+    """
+    try:
+        execution = await workflow_engine.get_execution_details(execution_id)
+        
+        if not execution:
+            raise HTTPException(status_code=404, detail="Execution not found")
+        
+        return {
+            "success": True,
+            "data": execution
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch execution details: {str(e)}")
+
+
+@router.post("/workflows/executions/{execution_id}/cancel")
+async def cancel_execution(
+    execution_id: str,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Cancel a running workflow execution
+    
+    - **execution_id**: ID of the execution to cancel
+    """
+    try:
+        cancelled = await workflow_engine.cancel_execution(execution_id)
+        
+        if not cancelled:
+            raise HTTPException(status_code=404, detail="Execution not found or not in progress")
+        
+        await log_admin_action(
+            admin_id=admin["id"],
+            admin_email=admin["email"],
+            action="workflow_execution_cancelled",
+            entity="workflow_execution",
+            entity_id=execution_id,
+            details={}
+        )
+        
+        return {
+            "success": True,
+            "message": "Workflow execution cancelled successfully"
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to cancel execution: {str(e)}")
+
+
+@router.get("/workflows/types")
+async def get_workflow_types(admin: dict = Depends(require_admin_or_above)):
+    """
+    Get list of available workflow types and their descriptions
+    """
+    return {
+        "success": True,
+        "data": {
+            "workflow_types": workflow_engine.WORKFLOW_TYPES,
+            "workflow_status": workflow_engine.WORKFLOW_STATUS,
+            "step_status": workflow_engine.STEP_STATUS
+        }
+    }
