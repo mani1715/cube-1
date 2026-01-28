@@ -375,6 +375,121 @@ backend:
         agent: "main"
         comment: "Mounted /static directory to serve uploaded images. Creates /app/backend/static/uploads/ automatically."
 
+  # ========================================
+  # PHASE 7.1 - ADVANCED SECURITY & COMPLIANCE
+  # ========================================
+
+  - task: "Soft Delete System"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/api/admin/phase7_router.py, /app/backend/api/admin/phase7_security.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 7.1 - Implemented soft delete for all entities (session_bookings, events, blogs, careers, volunteers, psychologists, contact_forms). Endpoints: DELETE /{entity}/{id}/soft-delete, POST /{entity}/{id}/restore, GET /{entity}/deleted. Added is_deleted, deleted_at, deleted_by fields to all collections."
+
+  - task: "Password Rotation System"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/api/admin/phase7_router.py, /app/backend/api/admin/phase7_security.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 7.1 - Implemented password rotation with 90-day expiry, 14-day warning. Endpoints: GET /password/status, POST /password/change. Added password_changed_at field to admins. Auto-calculates password age and expiry."
+
+  - task: "Mock 2FA System"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/api/admin/phase7_router.py, /app/backend/api/admin/phase7_security.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 7.1 - Implemented mock 2FA structure (placeholder for future). Endpoints: POST /2fa/setup, POST /2fa/verify, DELETE /2fa/disable. Added two_factor_enabled, two_factor_secret fields to admins. Currently mocked - always succeeds."
+
+  - task: "Approval Workflow System"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/api/admin/phase7_router.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 7.1 - Implemented approval workflow for destructive actions. Endpoints: POST /approval/request, GET /approval/requests, POST /approval/requests/{id}/review. Created approval_requests collection with pending/approved/rejected status. Super_admin reviews and approves."
+
+  - task: "Feature Toggle System"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/api/admin/phase7_router.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 7.1 - Implemented feature toggles for enabling/disabling features without redeploy. Endpoints: GET /features, PUT /features/{name}. Created feature_toggles collection with 8 default features (session_booking, event_registration, etc.). Super_admin can toggle features."
+
+  - task: "Admin Notes System"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/api/admin/phase7_router.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 7.1 - Implemented admin notes on records. Endpoints: POST /notes, GET /notes/{entity}/{id}. Created admin_notes collection. Allows internal collaboration and documentation on any record."
+
+  - task: "Sensitive Field Masking"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/api/admin/phase7_security.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 7.1 - Implemented utility functions for masking sensitive data. Functions: mask_email(), mask_phone(), mask_ip(). Applied to deleted entity lists and audit logs for privacy."
+
+  - task: "GDPR Compliance Tools"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/api/admin/phase7_router.py, /app/backend/api/admin/phase7_security.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 7.1 - Implemented GDPR compliance tools. Endpoints: GET /gdpr/retention-policy, DELETE /gdpr/{entity}/{id}/purge. Data retention policies for all entities (1-7 years). Purge endpoint for permanent deletion (Right to Erasure)."
+
+  - task: "Phase 7.1 Database Migration"
+    implemented: true
+    working: true
+    file: "/app/backend/phase7_migration.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 7.1 - Created and ran migration script to add soft delete fields, password rotation fields, 2FA fields. Created feature_toggles collection with 8 defaults. Created indexes for new collections."
+      - working: true
+        agent: "main"
+        comment: "✅ Migration executed successfully. All collections updated with soft delete fields. Admin security fields added. Feature toggles created. Indexes created for approval_requests, feature_toggles, admin_notes."
+
   - task: "Session Booking API"
     implemented: true
     working: true
