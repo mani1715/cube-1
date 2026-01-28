@@ -38,24 +38,26 @@ import ErrorBoundary from "./admin/components/ErrorBoundary";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AdminProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/book-session" element={<BookSession />} />
-            <Route path="/events" element={<Events />} />
-            <Route path="/blogs" element={<Blogs />} />
-            <Route path="/careers" element={<Careers />} />
-            <Route path="/psychologist-portal" element={<PsychologistPortal />} />
-            <Route path="/volunteer" element={<Volunteer />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <CookieConsent />
+        <BrowserRouter>
+          <AdminProvider>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/book-session" element={<BookSession />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/blogs" element={<Blogs />} />
+              <Route path="/careers" element={<Careers />} />
+              <Route path="/psychologist-portal" element={<PsychologistPortal />} />
+              <Route path="/volunteer" element={<Volunteer />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
             
             {/* Admin Login Route (Public) */}
             <Route path="/admin/login" element={<AdminLogin />} />
@@ -84,6 +86,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;
