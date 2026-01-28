@@ -818,12 +818,14 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Soft Delete System"
-    - "Password Rotation System"
-    - "Approval Workflow System"
-    - "Feature Toggle System"
-    - "Admin Notes System"
-    - "GDPR Compliance Tools"
+    - "AI Blog Draft Generation"
+    - "AI Content Improvement"
+    - "AI Tag Suggestion"
+    - "AI Title Suggestion"
+    - "AI Summary Generation"
+    - "AI Quality Check"
+    - "AI Feature Status Endpoint"
+    - "Emergent Universal Key Integration"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
