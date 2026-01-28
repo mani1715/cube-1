@@ -56,6 +56,7 @@ phase7_router = APIRouter(prefix="/api/admin/security", tags=["Phase 7 - Securit
 @limiter.limit(ADMIN_RATE_LIMIT)
 async def soft_delete_entity(
     request: Request,
+    request: Request,
     entity: str,
     entity_id: str,
     credentials: HTTPAuthorizationCredentials = Depends(security),
@@ -117,6 +118,7 @@ async def soft_delete_entity(
 @phase7_router.post("/{entity}/{entity_id}/restore")
 @limiter.limit(ADMIN_RATE_LIMIT)
 async def restore_entity(
+    request: Request,
     entity: str,
     entity_id: str,
     credentials: HTTPAuthorizationCredentials = Depends(security),
@@ -177,6 +179,7 @@ async def restore_entity(
 @phase7_router.get("/{entity}/deleted")
 @limiter.limit(ADMIN_RATE_LIMIT)
 async def get_deleted_entities(
+    request: Request,
     entity: str,
     page: int = 1,
     limit: int = 20,
@@ -233,6 +236,7 @@ async def get_deleted_entities(
 @phase7_router.get("/password/status")
 @limiter.limit(ADMIN_RATE_LIMIT)
 async def get_password_status(
+    request: Request,
     credentials: HTTPAuthorizationCredentials = Depends(security),
     admin: dict = Depends(get_current_admin)
 ):
@@ -310,6 +314,7 @@ async def change_password(
 @phase7_router.post("/2fa/setup")
 @limiter.limit(ADMIN_RATE_LIMIT)
 async def setup_2fa(
+    request: Request,
     setup_data: TwoFactorSetup,
     credentials: HTTPAuthorizationCredentials = Depends(security),
     admin: dict = Depends(get_current_admin)
@@ -332,6 +337,7 @@ async def setup_2fa(
 @phase7_router.post("/2fa/verify")
 @limiter.limit(ADMIN_RATE_LIMIT)
 async def verify_2fa(
+    request: Request,
     verify_data: TwoFactorVerify,
     credentials: HTTPAuthorizationCredentials = Depends(security),
     admin: dict = Depends(get_current_admin)
@@ -374,6 +380,7 @@ async def verify_2fa(
 @phase7_router.delete("/2fa/disable")
 @limiter.limit(ADMIN_RATE_LIMIT)
 async def disable_2fa(
+    request: Request,
     credentials: HTTPAuthorizationCredentials = Depends(security),
     admin: dict = Depends(get_current_admin)
 ):
@@ -409,6 +416,7 @@ async def disable_2fa(
 @phase7_router.post("/approval/request")
 @limiter.limit(ADMIN_RATE_LIMIT)
 async def create_approval_request(
+    request: Request,
     request_data: ApprovalRequest,
     credentials: HTTPAuthorizationCredentials = Depends(security),
     admin: dict = Depends(require_admin_or_above)
@@ -446,6 +454,7 @@ async def create_approval_request(
 @phase7_router.get("/approval/requests")
 @limiter.limit(ADMIN_RATE_LIMIT)
 async def get_approval_requests(
+    request: Request,
     status: Optional[str] = None,
     page: int = 1,
     limit: int = 20,
@@ -487,6 +496,7 @@ async def get_approval_requests(
 @phase7_router.post("/approval/requests/{request_id}/review")
 @limiter.limit(ADMIN_RATE_LIMIT)
 async def review_approval_request(
+    request: Request,
     request_id: str,
     review_data: ApprovalReview,
     credentials: HTTPAuthorizationCredentials = Depends(security),
@@ -547,6 +557,7 @@ async def review_approval_request(
 @phase7_router.get("/features")
 @limiter.limit(ADMIN_RATE_LIMIT)
 async def get_feature_toggles(
+    request: Request,
     credentials: HTTPAuthorizationCredentials = Depends(security),
     admin: dict = Depends(get_current_admin)
 ):
@@ -560,6 +571,7 @@ async def get_feature_toggles(
 @phase7_router.put("/features/{feature_name}")
 @limiter.limit(ADMIN_RATE_LIMIT)
 async def update_feature_toggle(
+    request: Request,
     feature_name: str,
     update_data: FeatureToggleUpdate,
     credentials: HTTPAuthorizationCredentials = Depends(security),
@@ -613,6 +625,7 @@ async def update_feature_toggle(
 @phase7_router.post("/notes")
 @limiter.limit(ADMIN_RATE_LIMIT)
 async def create_admin_note(
+    request: Request,
     note_data: AdminNote,
     credentials: HTTPAuthorizationCredentials = Depends(security),
     admin: dict = Depends(require_admin_or_above)
@@ -636,6 +649,7 @@ async def create_admin_note(
 @phase7_router.get("/notes/{entity}/{entity_id}")
 @limiter.limit(ADMIN_RATE_LIMIT)
 async def get_admin_notes(
+    request: Request,
     entity: str,
     entity_id: str,
     credentials: HTTPAuthorizationCredentials = Depends(security),
@@ -659,6 +673,7 @@ async def get_admin_notes(
 @phase7_router.get("/gdpr/retention-policy")
 @limiter.limit(ADMIN_RATE_LIMIT)
 async def get_retention_policies(
+    request: Request,
     credentials: HTTPAuthorizationCredentials = Depends(security),
     admin: dict = Depends(get_current_admin)
 ):
