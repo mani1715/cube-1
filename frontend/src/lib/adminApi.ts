@@ -455,6 +455,10 @@ export const adminFileAPI = {
 
     return await response.json();
   },
+};
+
+// Alias for compatibility
+export const adminFileUploadAPI = adminFileAPI;
 
   // Bulk Operations
   bulkDelete: async (entity: string, ids: string[]) => {
