@@ -331,6 +331,273 @@ async def get_ai_status(admin: dict = Depends(get_current_admin)):
         feature_toggle = db.feature_toggles.find_one({"name": "ai_assistance"})
         is_enabled = feature_toggle["enabled"] if feature_toggle else True
         
+
+
+# ==========================================
+# NOTIFICATION RULE ENGINE ENDPOINTS
+# ==========================================
+
+@router.get("/notifications/rules")
+async def get_notification_rules(
+    rule_type: Optional[str] = None,
+    enabled: Optional[bool] = None,
+    page: int = 1,
+    limit: int = 50,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Get all notification rules with optional filters
+    
+    - **rule_type**: Filter by rule type (event_based, threshold_based, scheduled)
+    - **enabled**: Filter by enabled status
+    - **page**: Page number
+    - **limit**: Items per page
+    """
+    try:
+        skip = (page - 1) * limit
+        result = await notification_engine.get_rules(
+            rule_type=rule_type,
+            enabled=enabled,
+            skip=skip,
+            limit=limit
+        )
+        
+        return {
+            "success": True,
+            "data": result["rules"],
+            "pagination": {
+                "total": result["total"],
+                "page": page,
+                "limit": limit,
+                "pages": (result["total"] + limit - 1) // limit
+            }
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch rules: {str(e)}")
+
+
+@router.post("/notifications/rules")
+async def create_notification_rule(
+    request: NotificationRuleCreate,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Create a new notification rule
+    
+    - **name**: Rule name
+    - **description**: Rule description
+    - **rule_type**: event_based, threshold_based, or scheduled
+    - **trigger_event**: Event that triggers the rule
+    - **conditions**: Conditions that must be met
+    - **actions**: Actions to execute when triggered
+    - **enabled**: Whether rule is active
+    """
+    try:
+        rule = await notification_engine.create_rule(
+            name=request.name,
+            description=request.description,
+            rule_type=request.rule_type,
+            trigger_event=request.trigger_event,
+            conditions=request.conditions,
+            actions=request.actions,
+            enabled=request.enabled,
+            created_by=admin["id"]
+        )
+        
+        await log_admin_action(
+            admin_id=admin["id"],
+            admin_email=admin["email"],
+            action="notification_rule_created",
+            entity="notification_rule",
+            entity_id=rule["id"],
+            details={"name": rule["name"]}
+        )
+        
+        return {
+            "success": True,
+            "data": rule,
+            "message": "Notification rule created successfully"
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create rule: {str(e)}")
+
+
+@router.put("/notifications/rules/{rule_id}")
+async def update_notification_rule(
+    rule_id: str,
+    request: NotificationRuleUpdate,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Update an existing notification rule
+    
+    - **rule_id**: ID of the rule to update
+    """
+    try:
+        # Build updates dict from non-None fields
+        updates = {k: v for k, v in request.dict().items() if v is not None}
+        
+        if not updates:
+            raise HTTPException(status_code=400, detail="No fields to update")
+        
+        updated_rule = await notification_engine.update_rule(rule_id, updates)
+        
+        await log_admin_action(
+            admin_id=admin["id"],
+            admin_email=admin["email"],
+            action="notification_rule_updated",
+            entity="notification_rule",
+            entity_id=rule_id,
+            details=updates
+        )
+        
+        return {
+            "success": True,
+            "data": updated_rule,
+            "message": "Notification rule updated successfully"
+        }
+    
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update rule: {str(e)}")
+
+
+@router.delete("/notifications/rules/{rule_id}")
+async def delete_notification_rule(
+    rule_id: str,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Delete a notification rule
+    
+    - **rule_id**: ID of the rule to delete
+    """
+    try:
+        deleted = await notification_engine.delete_rule(rule_id)
+        
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Rule not found")
+        
+        await log_admin_action(
+            admin_id=admin["id"],
+            admin_email=admin["email"],
+            action="notification_rule_deleted",
+            entity="notification_rule",
+            entity_id=rule_id,
+            details={}
+        )
+        
+        return {
+            "success": True,
+            "message": "Notification rule deleted successfully"
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete rule: {str(e)}")
+
+
+@router.get("/notifications")
+async def get_notifications(
+    read: Optional[bool] = None,
+    severity: Optional[str] = None,
+    page: int = 1,
+    limit: int = 50,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Get admin notifications/alerts
+    
+    - **read**: Filter by read status
+    - **severity**: Filter by severity (info, warning, error)
+    - **page**: Page number
+    - **limit**: Items per page
+    """
+    try:
+        skip = (page - 1) * limit
+        result = await notification_engine.get_notifications(
+            read=read,
+            severity=severity,
+            skip=skip,
+            limit=limit
+        )
+        
+        return {
+            "success": True,
+            "data": result["notifications"],
+            "unread_count": result["unread_count"],
+            "pagination": {
+                "total": result["total"],
+                "page": page,
+                "limit": limit,
+                "pages": (result["total"] + limit - 1) // limit
+            }
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch notifications: {str(e)}")
+
+
+@router.patch("/notifications/{notification_id}/read")
+async def mark_notification_read(
+    notification_id: str,
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Mark a notification as read
+    
+    - **notification_id**: ID of the notification
+    """
+    try:
+        success = await notification_engine.mark_notification_read(notification_id)
+        
+        if not success:
+            raise HTTPException(status_code=404, detail="Notification not found")
+        
+        return {
+            "success": True,
+            "message": "Notification marked as read"
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to mark notification as read: {str(e)}")
+
+
+@router.post("/notifications/mark-all-read")
+async def mark_all_notifications_read(
+    admin: dict = Depends(require_admin_or_above)
+):
+    """
+    Mark all notifications as read
+    """
+    try:
+        count = await notification_engine.mark_all_notifications_read()
+        
+        return {
+            "success": True,
+            "message": f"{count} notifications marked as read"
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to mark notifications as read: {str(e)}")
+
+
+@router.get("/notifications/trigger-events")
+async def get_trigger_events(admin: dict = Depends(require_admin_or_above)):
+    """
+    Get list of available trigger events for notification rules
+    """
+    return {
+        "success": True,
+        "data": {
+            "events": notification_engine.TRIGGER_EVENTS,
+            "action_types": notification_engine.ACTION_TYPES,
+            "rule_types": notification_engine.RULE_TYPES
+        }
+    }
+
         return {
             "success": True,
             "data": {
