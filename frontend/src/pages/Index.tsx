@@ -39,6 +39,11 @@ const stats = [
 const Index = () => {
   return (
     <Layout>
+      <SEO 
+        title="Home"
+        description="A-Cube Mental Health Platform - Professional therapy services, licensed psychologists, and wellness programs. Book your therapy session today and start your journey to mental wellness."
+        keywords={['mental health services', 'online therapy', 'licensed psychologists', 'counseling', 'therapy sessions', 'mental wellness', 'group therapy', 'individual therapy']}
+      />
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden">
         <div 
