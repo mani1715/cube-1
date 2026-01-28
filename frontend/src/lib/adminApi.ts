@@ -353,4 +353,75 @@ export const adminFileAPI = {
 
     return await response.json();
   },
+
+  // Bulk Operations
+  bulkDelete: async (entity: string, ids: string[]) => {
+    return await adminApiRequest('/api/admin/bulk/delete', {
+      method: 'POST',
+      body: JSON.stringify({ entity, ids }),
+    });
+  },
+
+  bulkExport: async (entity: string, format: string = 'csv', status?: string) => {
+    const params = new URLSearchParams({ format });
+    if (status) params.append('status', status);
+    
+    const data = await adminApiRequest(`/api/admin/bulk/export/${entity}?${params.toString()}`);
+    return data;
+  },
+
+  // Global Search
+  globalSearch: async (query: string, limit: number = 20) => {
+    const params = new URLSearchParams({ q: query, limit: limit.toString() });
+    return await adminApiRequest(`/api/admin/search/global?${params.toString()}`);
+  },
+
+  // Error Tracking
+  logError: async (errorData: {
+    error_type: string;
+    severity: string;
+    message: string;
+    stack_trace?: string;
+    component?: string;
+    url?: string;
+    context?: any;
+  }) => {
+    return await adminApiRequest('/api/admin/errors/log', {
+      method: 'POST',
+      body: JSON.stringify(errorData),
+    });
+  },
+
+  getErrors: async (page: number = 1, limit: number = 50, filters?: {
+    severity?: string;
+    error_type?: string;
+    resolved?: boolean;
+  }) => {
+    const params = new URLSearchParams({ 
+      page: page.toString(), 
+      limit: limit.toString() 
+    });
+    
+    if (filters?.severity) params.append('severity', filters.severity);
+    if (filters?.error_type) params.append('error_type', filters.error_type);
+    if (filters?.resolved !== undefined) params.append('resolved', filters.resolved.toString());
+    
+    return await adminApiRequest(`/api/admin/errors/list?${params.toString()}`);
+  },
+
+  getErrorStats: async () => {
+    return await adminApiRequest('/api/admin/errors/stats');
+  },
+
+  resolveError: async (errorId: string) => {
+    return await adminApiRequest(`/api/admin/errors/${errorId}/resolve`, {
+      method: 'PATCH',
+    });
+  },
+
+  deleteError: async (errorId: string) => {
+    return await adminApiRequest(`/api/admin/errors/${errorId}`, {
+      method: 'DELETE',
+    });
+  },
 };
