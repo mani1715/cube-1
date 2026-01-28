@@ -51,6 +51,25 @@ class QualityCheckRequest(BaseModel):
     content: str = Field(..., description="Blog content")
 
 
+# Notification Rule Models
+class NotificationRuleCreate(BaseModel):
+    name: str = Field(..., description="Rule name")
+    description: str = Field(..., description="Rule description")
+    rule_type: str = Field(..., description="Rule type: event_based, threshold_based, scheduled")
+    trigger_event: str = Field(..., description="Trigger event type")
+    conditions: Dict[str, Any] = Field(default_factory=dict, description="Rule conditions")
+    actions: List[Dict[str, Any]] = Field(..., description="Actions to execute")
+    enabled: bool = Field(True, description="Whether rule is enabled")
+
+
+class NotificationRuleUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    enabled: Optional[bool] = None
+    conditions: Optional[Dict[str, Any]] = None
+    actions: Optional[List[Dict[str, Any]]] = None
+
+
 # ==========================================
 # AI BLOG ASSISTANT ENDPOINTS
 # ==========================================
