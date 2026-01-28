@@ -24,6 +24,7 @@ const AdminSidebar = () => {
     { icon: UserPlus, label: 'Volunteers', path: '/admin/volunteers' },
     { icon: Briefcase, label: 'Jobs', path: '/admin/jobs' },
     { icon: MessageSquare, label: 'Contacts', path: '/admin/contacts' },
+    { icon: AlertTriangle, label: 'Error Tracking', path: '/admin/errors' },
     { icon: Settings, label: 'Settings', path: '/admin/settings' },
   ];
 
