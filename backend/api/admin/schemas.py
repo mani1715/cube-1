@@ -72,3 +72,80 @@ class PaginatedResponse(BaseModel):
     limit: int
     total_pages: int
 
+
+# ========================================
+# PHASE 7.1 - ADVANCED SECURITY SCHEMAS
+# ========================================
+
+# Approval Workflow Schemas
+class ApprovalRequest(BaseModel):
+    """Schema for admin action approval requests"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    requester_id: str
+    requester_email: str
+    action_type: str  # delete, bulk_delete, purge, restore
+    entity: str  # sessions, events, blogs, etc.
+    entity_ids: List[str]
+    reason: str = Field(..., max_length=500)
+    status: str = "pending"  # pending, approved, rejected
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    reviewed_at: Optional[datetime] = None
+    reviewed_by: Optional[str] = None
+    reviewer_comment: Optional[str] = None
+
+
+class ApprovalReview(BaseModel):
+    """Schema for reviewing approval requests"""
+    status: str  # approved or rejected
+    comment: str = Field(..., max_length=500)
+
+
+# Feature Toggle Schemas
+class FeatureToggle(BaseModel):
+    """Schema for feature flags"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    feature_name: str = Field(..., max_length=100)
+    description: str = Field(..., max_length=500)
+    is_enabled: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_by: str = ""
+
+
+class FeatureToggleUpdate(BaseModel):
+    """Schema for updating feature toggle"""
+    is_enabled: bool
+    reason: Optional[str] = Field(None, max_length=200)
+
+
+# Admin Notes Schema
+class AdminNote(BaseModel):
+    """Schema for admin notes on records"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    entity: str  # sessions, events, blogs, etc.
+    entity_id: str
+    admin_id: str
+    admin_email: str
+    note: str = Field(..., max_length=2000)
+    is_internal: bool = True  # Internal notes not visible to users
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+# Password Change Schema
+class PasswordChange(BaseModel):
+    """Schema for password change requests"""
+    current_password: str = Field(..., min_length=8)
+    new_password: str = Field(..., min_length=8)
+
+
+# 2FA Schemas (Mock)
+class TwoFactorSetup(BaseModel):
+    """Schema for 2FA setup"""
+    email: EmailStr
+
+
+class TwoFactorVerify(BaseModel):
+    """Schema for 2FA verification"""
+    email: EmailStr
+    otp: str = Field(..., min_length=6, max_length=6)
+
