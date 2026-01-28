@@ -1,6 +1,8 @@
 import { Layout } from "@/components/layout/Layout";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import contactBg from "@/assets/bg-contact.jpg";
+import SEO from "@/components/SEO";
+import { Link } from "react-router-dom";
 
 const Privacy = () => {
   return (
