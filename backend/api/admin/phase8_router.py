@@ -618,24 +618,3 @@ async def get_trigger_events(admin: dict = Depends(require_admin_or_above)):
             "rule_types": notification_engine.RULE_TYPES
         }
     }
-
-        return {
-            "success": True,
-            "data": {
-                "configured": is_configured,
-                "enabled": is_enabled,
-                "provider": "OpenAI",
-                "model": "gpt-4o-mini",
-                "features": [
-                    "blog_draft_generation",
-                    "content_improvement",
-                    "tag_suggestion",
-                    "title_suggestion",
-                    "summary_generation",
-                    "quality_check"
-                ]
-            }
-        }
-    
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Status check failed: {str(e)}")
