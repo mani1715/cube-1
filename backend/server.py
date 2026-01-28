@@ -432,12 +432,14 @@ from api.admin.bulk_operations import bulk_router
 from api.admin.search import search_router
 from api.admin.error_tracking import error_router
 from api.admin.phase7_router import phase7_router  # Phase 7.1 - Security & Compliance
+from api.admin.phase8_router import router as phase8_router  # Phase 8.1A - AI & Automation
 app.include_router(admin_router)
 app.include_router(auth_router)
 app.include_router(bulk_router)
 app.include_router(search_router)
 app.include_router(error_router)
 app.include_router(phase7_router)  # Phase 7.1 routes
+app.include_router(phase8_router)  # Phase 8.1A routes
 
 # Mount static files for uploads
 from fastapi.staticfiles import StaticFiles
