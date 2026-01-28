@@ -336,12 +336,21 @@ async def get_psychologist(psychologist_id: str):
 
 # ============= CONTACT FORM ENDPOINTS =============
 @api_router.post("/contact", response_model=ContactForm, status_code=status.HTTP_201_CREATED)
-async def submit_contact_form(contact: ContactFormCreate):
+@limiter.limit(PUBLIC_RATE_LIMIT)
+async def submit_contact_form(request: Request, contact: ContactFormCreate, background_tasks: BackgroundTasks):
     """Submit a contact form"""
     try:
         contact_obj = ContactForm(**contact.dict())
         await db.contact_forms.insert_one(contact_obj.dict())
         logger.info(f"New contact form submission: {contact_obj.id}")
+        
+        # Send acknowledgment email in background
+        background_tasks.add_task(
+            EmailService.send_contact_form_acknowledgment,
+            to_email=contact_obj.email,
+            contact_data=contact_obj.dict()
+        )
+        
         return contact_obj
     except Exception as e:
         logger.error(f"Error submitting contact form: {str(e)}")
@@ -349,7 +358,8 @@ async def submit_contact_form(contact: ContactFormCreate):
 
 
 @api_router.get("/contact", response_model=List[ContactForm])
-async def get_all_contact_forms(status_filter: Optional[str] = None):
+@limiter.limit(PUBLIC_RATE_LIMIT)
+async def get_all_contact_forms(request: Request, status_filter: Optional[str] = None):
     """Get all contact form submissions with optional status filter"""
     try:
         query = {"status": status_filter} if status_filter else {}
