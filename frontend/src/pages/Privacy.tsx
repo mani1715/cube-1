@@ -56,7 +56,25 @@ const Privacy = () => {
 
               <ScrollReveal delay={500}>
                 <div className="p-6 rounded-2xl bg-primary/5 border border-primary/20">
-                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">Contact Us</h2>
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">Your Data Rights</h2>
+                  <p className="text-muted-foreground mb-4">
+                    You have the right to access, modify, or delete your personal data. You can also request a complete export of your data.
+                  </p>
+                  <div className="flex flex-wrap gap-3 mb-6">
+                    <Link 
+                      to="/data-export" 
+                      className="inline-flex items-center px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium"
+                    >
+                      Request Data Export
+                    </Link>
+                    <Link 
+                      to="/account-deletion" 
+                      className="inline-flex items-center px-4 py-2 rounded-lg border border-destructive text-destructive hover:bg-destructive/10 transition-colors font-medium"
+                    >
+                      Request Account Deletion
+                    </Link>
+                  </div>
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4 mt-6">Contact Us</h2>
                   <p className="text-muted-foreground mb-4">If you have any questions about this Privacy Policy, please contact us:</p>
                   <div className="space-y-1">
                     <p className="text-foreground font-medium">A-Cube Privacy Team</p>
