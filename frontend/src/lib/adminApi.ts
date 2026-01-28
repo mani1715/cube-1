@@ -1,5 +1,5 @@
 // Admin API Configuration
-const API_BASE_URL = import.meta.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || '';
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || '';
 
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
