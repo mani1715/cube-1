@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { adminAPI } from '@/lib/adminApi';
+import { adminErrorAPI as adminAPI } from '@/lib/adminApi';
 import { toast } from 'sonner';
 import { AlertTriangle, CheckCircle, Trash2, RefreshCw } from 'lucide-react';
 import {
