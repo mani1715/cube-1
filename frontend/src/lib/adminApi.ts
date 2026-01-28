@@ -331,6 +331,108 @@ export const adminJobsAPI = {
   },
 };
 
+// Admin Psychologists API
+export const adminPsychologistsAPI = {
+  getPsychologists: async (page: number = 1, limit: number = 10) => {
+    const params = new URLSearchParams();
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    return adminApiRequest(`/api/admin/psychologists?${params.toString()}`);
+  },
+
+  createPsychologist: async (psychologistData: any) => {
+    return adminApiRequest('/api/admin/psychologists', {
+      method: 'POST',
+      body: JSON.stringify(psychologistData),
+    });
+  },
+
+  updatePsychologist: async (psychologistId: string, psychologistData: any) => {
+    return adminApiRequest(`/api/admin/psychologists/${psychologistId}`, {
+      method: 'PUT',
+      body: JSON.stringify(psychologistData),
+    });
+  },
+
+  deletePsychologist: async (psychologistId: string) => {
+    return adminApiRequest(`/api/admin/psychologists/${psychologistId}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
+// Admin Volunteers API
+export const adminVolunteersAPI = {
+  getVolunteers: async (page: number = 1, limit: number = 10, status?: string) => {
+    const params = new URLSearchParams();
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    if (status) params.append('status', status);
+    return adminApiRequest(`/api/admin/volunteers?${params.toString()}`);
+  },
+
+  updateVolunteer: async (volunteerId: string, volunteerData: any) => {
+    return adminApiRequest(`/api/admin/volunteers/${volunteerId}`, {
+      method: 'PUT',
+      body: JSON.stringify(volunteerData),
+    });
+  },
+
+  deleteVolunteer: async (volunteerId: string) => {
+    return adminApiRequest(`/api/admin/volunteers/${volunteerId}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
+// Admin Contacts API
+export const adminContactsAPI = {
+  getContacts: async (page: number = 1, limit: number = 10, status?: string) => {
+    const params = new URLSearchParams();
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    if (status) params.append('status', status);
+    return adminApiRequest(`/api/admin/contacts?${params.toString()}`);
+  },
+
+  updateContact: async (contactId: string, contactData: any) => {
+    return adminApiRequest(`/api/admin/contacts/${contactId}`, {
+      method: 'PUT',
+      body: JSON.stringify(contactData),
+    });
+  },
+
+  deleteContact: async (contactId: string) => {
+    return adminApiRequest(`/api/admin/contacts/${contactId}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
+// Admin Logs API (alias for audit logs)
+export const adminLogsAPI = {
+  getLogs: async (page: number = 1, limit: number = 50, filters?: any) => {
+    return adminAuditLogsAPI.getLogs(page, limit, filters);
+  },
+  getStats: async () => {
+    return adminAuditLogsAPI.getStats();
+  },
+};
+
+// Admin Settings API
+export const adminAPI = {
+  getSettings: async () => {
+    return adminApiRequest('/api/admin/settings');
+  },
+  
+  updateSettings: async (settings: any) => {
+    return adminApiRequest('/api/admin/settings', {
+      method: 'PUT',
+      body: JSON.stringify(settings),
+    });
+  },
+};
+
 // Admin File Upload API
 export const adminFileAPI = {
   uploadFile: async (file: File) => {
