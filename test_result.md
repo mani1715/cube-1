@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Phase 5.1: Core Security & Performance - RBAC, JWT refresh tokens, audit logging, pagination, toast notifications, MongoDB indexing, auto-logout on inactivity"
+user_problem_statement: "Phase 6.1: System Stability & Background Processing - Background jobs (email, audit export, bulk ops), Rate limiting (public/admin/auth endpoints), FastAPI BackgroundTasks integration"
 
 backend:
   - task: "RBAC - Role-Based Access Control"
