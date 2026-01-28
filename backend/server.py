@@ -265,12 +265,21 @@ async def apply_for_job(job_id: str, application: CareerApplication):
 
 # ============= VOLUNTEER ENDPOINTS =============
 @api_router.post("/volunteers", response_model=Volunteer, status_code=status.HTTP_201_CREATED)
-async def create_volunteer_application(volunteer: VolunteerCreate):
+@limiter.limit(PUBLIC_RATE_LIMIT)
+async def create_volunteer_application(request: Request, volunteer: VolunteerCreate, background_tasks: BackgroundTasks):
     """Submit volunteer application"""
     try:
         volunteer_obj = Volunteer(**volunteer.dict())
         await db.volunteers.insert_one(volunteer_obj.dict())
         logger.info(f"New volunteer application: {volunteer_obj.id}")
+        
+        # Send confirmation email in background
+        background_tasks.add_task(
+            EmailService.send_volunteer_application_received,
+            to_email=volunteer_obj.email,
+            volunteer_data=volunteer_obj.dict()
+        )
+        
         return volunteer_obj
     except Exception as e:
         logger.error(f"Error creating volunteer application: {str(e)}")
@@ -278,7 +287,8 @@ async def create_volunteer_application(volunteer: VolunteerCreate):
 
 
 @api_router.get("/volunteers", response_model=List[Volunteer])
-async def get_all_volunteers(status_filter: Optional[str] = None):
+@limiter.limit(PUBLIC_RATE_LIMIT)
+async def get_all_volunteers(request: Request, status_filter: Optional[str] = None):
     """Get all volunteer applications with optional status filter"""
     try:
         query = {"status": status_filter} if status_filter else {}
