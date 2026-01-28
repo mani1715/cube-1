@@ -28,8 +28,10 @@ import AdminJobs from "./admin/pages/AdminJobs";
 import AdminContacts from "./admin/pages/AdminContacts";
 import AdminSettings from "./admin/pages/AdminSettings";
 import AdminLogs from "./admin/pages/AdminLogs";
+import AdminErrors from "./admin/pages/AdminErrors";
 import AdminLogin from "./admin/AdminLogin";
 import AdminProtectedRoute from "./admin/AdminProtectedRoute";
+import ErrorBoundary from "./admin/components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
