@@ -1062,17 +1062,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Workflow Template Management"
-    - "Workflow Execution Engine"
-    - "Workflow Actions"
-    - "Default Workflow Templates"
-    - "Session Analytics"
-    - "Event Analytics"
-    - "Blog Analytics"
-    - "Volunteer Analytics"
-    - "Contact Analytics"
-    - "Analytics Dashboard Overview"
-    - "Analytics CSV Export"
+    - "Production Health Check Endpoints"
+    - "SEO Sitemap & Robots.txt"
+    - "GDPR Compliance Endpoints"
+    - "Security Headers Middleware"
+    - "Google Analytics 4 Integration"
+    - "SEO Meta Tags Enhancement"
+    - "Structured Data (JSON-LD)"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
