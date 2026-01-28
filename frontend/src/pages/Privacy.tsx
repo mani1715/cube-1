@@ -7,6 +7,11 @@ import { Link } from "react-router-dom";
 const Privacy = () => {
   return (
     <Layout>
+      <SEO 
+        title="Privacy Policy"
+        description="A-Cube Privacy Policy - Learn how we protect your personal information, therapy session confidentiality, and data security practices."
+        keywords={['privacy policy', 'data protection', 'confidentiality', 'GDPR', 'data security', 'therapy privacy']}
+      />
       <section className="relative py-20 md:py-28 overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center"
