@@ -51,12 +51,21 @@ logger = logging.getLogger(__name__)
 
 # ============= SESSION BOOKING ENDPOINTS =============
 @api_router.post("/sessions/book", response_model=SessionBooking, status_code=status.HTTP_201_CREATED)
-async def book_session(booking: SessionBookingCreate):
+@limiter.limit(PUBLIC_RATE_LIMIT)
+async def book_session(request: Request, booking: SessionBookingCreate, background_tasks: BackgroundTasks):
     """Book a therapy session"""
     try:
         booking_obj = SessionBooking(**booking.dict())
         await db.session_bookings.insert_one(booking_obj.dict())
         logger.info(f"New session booking created: {booking_obj.id}")
+        
+        # Send confirmation email in background
+        background_tasks.add_task(
+            EmailService.send_session_confirmation,
+            to_email=booking_obj.email,
+            session_data=booking_obj.dict()
+        )
+        
         return booking_obj
     except Exception as e:
         logger.error(f"Error booking session: {str(e)}")
@@ -64,7 +73,8 @@ async def book_session(booking: SessionBookingCreate):
 
 
 @api_router.get("/sessions", response_model=List[SessionBooking])
-async def get_all_sessions(status_filter: Optional[str] = None):
+@limiter.limit(PUBLIC_RATE_LIMIT)
+async def get_all_sessions(request: Request, status_filter: Optional[str] = None):
     """Get all session bookings with optional status filter"""
     try:
         query = {"status": status_filter} if status_filter else {}
@@ -76,7 +86,8 @@ async def get_all_sessions(status_filter: Optional[str] = None):
 
 
 @api_router.get("/sessions/{session_id}", response_model=SessionBooking)
-async def get_session(session_id: str):
+@limiter.limit(PUBLIC_RATE_LIMIT)
+async def get_session(request: Request, session_id: str):
     """Get a specific session booking"""
     booking = await db.session_bookings.find_one({"id": session_id})
     if not booking:
@@ -85,7 +96,8 @@ async def get_session(session_id: str):
 
 
 @api_router.patch("/sessions/{session_id}/status")
-async def update_session_status(session_id: str, new_status: str):
+@limiter.limit(PUBLIC_RATE_LIMIT)
+async def update_session_status(request: Request, session_id: str, new_status: str):
     """Update session booking status"""
     result = await db.session_bookings.update_one(
         {"id": session_id},
