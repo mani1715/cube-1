@@ -254,6 +254,7 @@ async def get_password_status(
 @phase7_router.post("/password/change")
 @limiter.limit("5/minute")  # Stricter rate limit for password changes
 async def change_password(
+    request: Request,
     password_data: PasswordChange,
     credentials: HTTPAuthorizationCredentials = Depends(security),
     admin: dict = Depends(get_current_admin)
