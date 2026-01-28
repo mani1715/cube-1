@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
-from typing import List, Any
+from typing import List, Any, Optional
 import uuid
 
 
