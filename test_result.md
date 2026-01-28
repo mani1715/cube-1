@@ -183,6 +183,90 @@ backend:
         agent: "testing"
         comment: "✅ File upload endpoint working correctly. Successfully uploaded test PNG file with proper validation. Returns filename and URL path. File saved to /app/backend/static/uploads/ directory."
 
+  - task: "Background Job System - Email Service (Mock)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/api/admin/background_tasks.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 6.1 - Implemented mock email service using FastAPI BackgroundTasks. Methods: send_welcome_email, send_session_confirmation, send_event_registration, send_volunteer_application_received, send_contact_form_acknowledgment, send_bulk_operation_report. All emails logged to console for now."
+
+  - task: "Background Job System - Audit Export Service"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/api/admin/background_tasks.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 6.1 - Implemented audit log export to CSV in background. Exports up to 10,000 logs, saves to /app/backend/static/exports/, sends completion email (mocked). Endpoint: POST /api/admin/bulk/export/audit-logs"
+
+  - task: "Background Job System - Bulk Operations Service"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/api/admin/background_tasks.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 6.1 - Implemented background processing for bulk operations. Smart threshold: ≤100 items processed immediately, >100 items processed in background. Operations: bulk_delete, bulk_status_update. Sends completion emails (mocked)."
+
+  - task: "Rate Limiting - Public APIs"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py, /app/backend/api/admin/rate_limits.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 6.1 - Implemented rate limiting using SlowAPI. Public APIs: 10/minute. Applied to all session, event, volunteer, contact endpoints. Returns 429 status when exceeded."
+
+  - task: "Rate Limiting - Auth APIs"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/api/admin/auth.py, /app/backend/api/admin/rate_limits.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 6.1 - Implemented strict rate limiting on auth endpoints. Login/refresh: 5/minute to prevent brute-force attacks. Applied to POST /api/admin/auth/login and POST /api/admin/auth/refresh."
+
+  - task: "Rate Limiting - Admin Bulk Operations"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/api/admin/bulk_operations.py, /app/backend/api/admin/rate_limits.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 6.1 - Implemented rate limiting on bulk operations. Admin operations: 60/minute, Export operations: 5/minute. Applied to bulk delete, status update, and export endpoints."
+
+  - task: "Enhanced Bulk Operations with Background Processing"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/api/admin/bulk_operations.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 6.1 - Enhanced existing bulk operations with background processing. Added endpoints: POST /api/admin/bulk/export/audit-logs, POST /api/admin/bulk/status-update. Smart threshold for background processing (>100 items)."
+
   - task: "Session CRUD Endpoints"
     implemented: true
     working: "NA"
