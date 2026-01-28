@@ -226,7 +226,8 @@ async def admin_logout(
 
 # Login endpoint
 @auth_router.post("/login", response_model=AdminToken)
-async def admin_login(login_data: AdminLogin):
+@limiter.limit(AUTH_RATE_LIMIT)
+async def admin_login(request: Request, login_data: AdminLogin):
     """Admin login endpoint"""
     admin = await authenticate_admin(login_data.email, login_data.password)
     
