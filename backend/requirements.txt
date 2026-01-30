@@ -28,3 +28,4 @@ emergentintegrations==0.1.0
 slowapi>=0.1.9
 limits>=5.6.0
 deprecated
+wrapt>=1.16.0
