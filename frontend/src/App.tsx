@@ -76,6 +76,14 @@ const App = () => (
               <Route path="/data-export" element={<DataExport />} />
               <Route path="/account-deletion" element={<AccountDeletion />} />
             
+            {/* User Authentication Routes (Public) */}
+            <Route path="/login" element={<UserLogin />} />
+            <Route path="/signup" element={<UserSignup />} />
+            
+            {/* User Dashboard Route (Public - Auth handled inside) */}
+            <Route path="/user/dashboard" element={<UserDashboard />} />
+            <Route path="/user/profile" element={<UserDashboard />} />
+            
             {/* Admin Login Route (Public) */}
             <Route path="/admin/login" element={<AdminLogin />} />
             
