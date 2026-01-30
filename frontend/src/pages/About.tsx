@@ -4,6 +4,8 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { Link } from "react-router-dom";
 import { Users, Target, Heart, Award, ArrowRight, Linkedin } from "lucide-react";
 import aboutBg from "@/assets/bg-about.jpg";
+import ImpactStats from "@/components/ImpactStats";
+import Testimonials from "@/components/Testimonials";
 
 const values = [
   {
