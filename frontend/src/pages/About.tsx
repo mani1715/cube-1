@@ -210,6 +210,12 @@ const About = () => {
           </div>
         </div>
       </section>
+
+      {/* Impact Stats - Phase 10.1 */}
+      <ImpactStats />
+
+      {/* Testimonials - Phase 10.1 */}
+      <Testimonials />
     </Layout>
   );
 };
