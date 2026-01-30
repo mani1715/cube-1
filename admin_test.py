@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Backend URL from frontend/.env
-BASE_URL = "https://cube-master-23.preview.emergentagent.com/api"
+BASE_URL = "https://cubetracker-2.preview.emergentagent.com/api"
 
 class AdminTester:
     def __init__(self):
