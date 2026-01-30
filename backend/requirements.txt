@@ -29,3 +29,5 @@ slowapi>=0.1.9
 limits>=5.6.0
 deprecated
 wrapt>=1.16.0
+razorpay>=1.4.1
+resend>=2.0.0
