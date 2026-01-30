@@ -407,9 +407,222 @@ def test_security_headers_comprehensive():
     
     return all_headers_ok
 
+def test_phase12_user_authentication():
+    """Test Phase 12 User Authentication System"""
+    print_header("PHASE 12 - USER AUTHENTICATION SYSTEM")
+    
+    results = {}
+    tokens = {}  # Store tokens for subsequent tests
+    
+    # Test 1: User Signup
+    print_info("Testing User Signup: /api/phase12/users/signup")
+    try:
+        signup_data = {
+            "email": "testuser@example.com",
+            "password": "TestPass123",
+            "name": "Test User",
+            "phone": "1234567890"
+        }
+        
+        response = requests.post(
+            f"{BACKEND_URL}/api/phase12/users/signup",
+            json=signup_data,
+            timeout=10
+        )
+        
+        if response.status_code == 201:
+            data = response.json()
+            print_success("User Signup - Status: 201")
+            
+            if data.get('success') is True:
+                print_success("  Signup successful")
+            if 'user' in data and data['user'].get('email') == signup_data['email']:
+                print_success(f"  User created: {data['user']['email']}")
+            if 'access_token' in data and 'refresh_token' in data:
+                print_success("  JWT tokens generated")
+                tokens['access_token'] = data['access_token']
+                tokens['refresh_token'] = data['refresh_token']
+            if 'password' not in str(data):
+                print_success("  Password not exposed in response")
+            
+            check_security_headers(response, "User Signup")
+            results['/api/phase12/users/signup'] = True
+            
+        else:
+            print_error(f"User Signup - Status: {response.status_code}")
+            print_error(f"  Response: {response.text}")
+            results['/api/phase12/users/signup'] = False
+            
+    except Exception as e:
+        print_error(f"User Signup - Error: {str(e)}")
+        results['/api/phase12/users/signup'] = False
+    
+    # Test 2: User Login
+    print_info("Testing User Login: /api/phase12/users/login")
+    try:
+        login_data = {
+            "email": "testuser@example.com",
+            "password": "TestPass123"
+        }
+        
+        response = requests.post(
+            f"{BACKEND_URL}/api/phase12/users/login",
+            json=login_data,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("User Login - Status: 200")
+            
+            if data.get('success') is True:
+                print_success("  Login successful")
+            if 'user' in data and data['user'].get('email') == login_data['email']:
+                print_success(f"  User authenticated: {data['user']['email']}")
+            if 'access_token' in data and 'refresh_token' in data:
+                print_success("  JWT tokens generated")
+                # Update tokens from login
+                tokens['access_token'] = data['access_token']
+                tokens['refresh_token'] = data['refresh_token']
+            if 'last_login' in data['user']:
+                print_success("  Last login timestamp updated")
+            
+            check_security_headers(response, "User Login")
+            results['/api/phase12/users/login'] = True
+            
+        else:
+            print_error(f"User Login - Status: {response.status_code}")
+            print_error(f"  Response: {response.text}")
+            results['/api/phase12/users/login'] = False
+            
+    except Exception as e:
+        print_error(f"User Login - Error: {str(e)}")
+        results['/api/phase12/users/login'] = False
+    
+    # Test 3: Get Profile (with auth token)
+    if tokens.get('access_token'):
+        print_info("Testing Get Profile: /api/phase12/users/profile")
+        try:
+            headers = {"Authorization": f"Bearer {tokens['access_token']}"}
+            
+            response = requests.get(
+                f"{BACKEND_URL}/api/phase12/users/profile",
+                headers=headers,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                print_success("Get Profile - Status: 200")
+                
+                if data.get('success') is True:
+                    print_success("  Profile retrieved successfully")
+                if 'user' in data and data['user'].get('email') == "testuser@example.com":
+                    print_success(f"  Profile data: {data['user']['name']}")
+                if 'password' not in str(data):
+                    print_success("  Password not exposed in profile")
+                
+                check_security_headers(response, "Get Profile")
+                results['/api/phase12/users/profile'] = True
+                
+            else:
+                print_error(f"Get Profile - Status: {response.status_code}")
+                print_error(f"  Response: {response.text}")
+                results['/api/phase12/users/profile'] = False
+                
+        except Exception as e:
+            print_error(f"Get Profile - Error: {str(e)}")
+            results['/api/phase12/users/profile'] = False
+    else:
+        print_warning("Skipping profile test - no access token available")
+        results['/api/phase12/users/profile'] = False
+    
+    # Test 4: Token Refresh
+    if tokens.get('refresh_token'):
+        print_info("Testing Token Refresh: /api/phase12/users/refresh")
+        try:
+            refresh_data = {"refresh_token": tokens['refresh_token']}
+            
+            response = requests.post(
+                f"{BACKEND_URL}/api/phase12/users/refresh",
+                json=refresh_data,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                print_success("Token Refresh - Status: 200")
+                
+                if data.get('success') is True:
+                    print_success("  Token refresh successful")
+                if 'access_token' in data:
+                    print_success("  New access token generated")
+                    # Update access token
+                    tokens['access_token'] = data['access_token']
+                if data.get('token_type') == 'bearer':
+                    print_success("  Token type: bearer")
+                
+                check_security_headers(response, "Token Refresh")
+                results['/api/phase12/users/refresh'] = True
+                
+            else:
+                print_error(f"Token Refresh - Status: {response.status_code}")
+                print_error(f"  Response: {response.text}")
+                results['/api/phase12/users/refresh'] = False
+                
+        except Exception as e:
+            print_error(f"Token Refresh - Error: {str(e)}")
+            results['/api/phase12/users/refresh'] = False
+    else:
+        print_warning("Skipping token refresh test - no refresh token available")
+        results['/api/phase12/users/refresh'] = False
+    
+    # Test 5: Dashboard Overview
+    if tokens.get('access_token'):
+        print_info("Testing Dashboard Overview: /api/phase12/dashboard/overview")
+        try:
+            headers = {"Authorization": f"Bearer {tokens['access_token']}"}
+            
+            response = requests.get(
+                f"{BACKEND_URL}/api/phase12/dashboard/overview",
+                headers=headers,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                print_success("Dashboard Overview - Status: 200")
+                
+                if data.get('success') is True:
+                    print_success("  Dashboard data retrieved")
+                if 'overview' in data:
+                    overview = data['overview']
+                    print_success(f"  Total sessions: {overview.get('total_sessions', 0)}")
+                    print_success(f"  Total events: {overview.get('total_events', 0)}")
+                    print_success(f"  Total payments: {overview.get('total_payments', 0)}")
+                    print_success(f"  Saved blogs: {overview.get('saved_blogs', 0)}")
+                
+                check_security_headers(response, "Dashboard Overview")
+                results['/api/phase12/dashboard/overview'] = True
+                
+            else:
+                print_error(f"Dashboard Overview - Status: {response.status_code}")
+                print_error(f"  Response: {response.text}")
+                results['/api/phase12/dashboard/overview'] = False
+                
+        except Exception as e:
+            print_error(f"Dashboard Overview - Error: {str(e)}")
+            results['/api/phase12/dashboard/overview'] = False
+    else:
+        print_warning("Skipping dashboard test - no access token available")
+        results['/api/phase12/dashboard/overview'] = False
+    
+    return results
+
+
 def main():
     """Main testing function"""
-    print_header("PHASE 9 BACKEND ENDPOINTS TESTING")
+    print_header("PHASE 12 USER AUTHENTICATION TESTING")
     print_info(f"Testing backend at: {BACKEND_URL}")
     print_info(f"Test started at: {datetime.now().isoformat()}")
     
@@ -417,6 +630,10 @@ def main():
     
     # Run all tests
     try:
+        # Test Phase 12 User Authentication
+        phase12_results = test_phase12_user_authentication()
+        all_results.update(phase12_results)
+        
         # Test production health endpoints
         health_results = test_production_health_endpoints()
         all_results.update(health_results)
