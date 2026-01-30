@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Heart, Mail, Phone, MapPin, Instagram, Linkedin, Youtube } from "lucide-react";
+import { Heart, Mail, Phone, MapPin, Instagram, Linkedin } from "lucide-react";
 import { forwardRef } from "react";
 
 export const Footer = forwardRef<HTMLElement>((_, ref) => {
