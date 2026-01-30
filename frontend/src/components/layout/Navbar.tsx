@@ -90,6 +90,10 @@ export const Navbar = forwardRef<HTMLElement>((_, ref) => {
                 </Link>
               ))}
               <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border">
+                <div className="flex items-center justify-between px-4 mb-2">
+                  <span className="text-sm font-medium text-muted-foreground">Theme</span>
+                  <ThemeToggle />
+                </div>
                 <Link to="/volunteer" onClick={() => setIsOpen(false)}>
                   <Button variant="outline" className="w-full">
                     Volunteer
