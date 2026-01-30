@@ -94,7 +94,7 @@ export const Footer = forwardRef<HTMLElement>((_, ref) => {
               <ul className="space-y-2">
                 <li><Link to="/services" className="text-sm text-muted-foreground hover:text-primary transition-colors">1:1 Therapy</Link></li>
                 <li><Link to="/services" className="text-sm text-muted-foreground hover:text-primary transition-colors">Group Therapy</Link></li>
-                <li><Link to="/services" className="text-sm text-muted-foreground hover:text-primary transition-colors">Premium Articles</Link></li>
+                <li><Link to="/blogs" className="text-sm text-muted-foreground hover:text-primary transition-colors">Premium Articles</Link></li>
               </ul>
             </div>
 
