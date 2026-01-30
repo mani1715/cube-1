@@ -5,6 +5,9 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ArrowRight, Users, Calendar, BookOpen, Shield, Sparkles, Heart } from "lucide-react";
 import heroBg from "@/assets/bg-home-hero.jpg";
 import SEO from "@/components/SEO";
+import ImpactStats from "@/components/ImpactStats";
+import Testimonials from "@/components/Testimonials";
+import PrivacyHighlights from "@/components/PrivacyHighlights";
 
 const features = [
   {
