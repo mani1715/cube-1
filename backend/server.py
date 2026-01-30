@@ -436,6 +436,10 @@ from api.admin.phase8_router import router as phase8_router  # Phase 8.1A - AI &
 from api.phase9_production import phase9_prod_router  # Phase 9.1 - Production
 from api.phase9_seo import phase9_seo_router  # Phase 9.2 - SEO
 from api.phase9_compliance import phase9_compliance_router  # Phase 9.5 - Compliance
+from api.phase12_payments import phase12_payments_router  # Phase 12.1 - Payments
+from api.phase12_email import phase12_email_router  # Phase 12.2 - Email
+from api.phase12_users import phase12_users_router  # Phase 12.3 - User Auth
+from api.phase12_dashboard import phase12_dashboard_router  # Phase 12.4 - Dashboard
 app.include_router(admin_router)
 app.include_router(auth_router)
 app.include_router(bulk_router)
@@ -446,6 +450,10 @@ app.include_router(phase8_router)  # Phase 8.1A routes
 app.include_router(phase9_prod_router)  # Phase 9.1 routes
 app.include_router(phase9_seo_router)  # Phase 9.2 routes
 app.include_router(phase9_compliance_router)  # Phase 9.5 routes
+app.include_router(phase12_payments_router)  # Phase 12.1 routes
+app.include_router(phase12_email_router)  # Phase 12.2 routes
+app.include_router(phase12_users_router)  # Phase 12.3 routes
+app.include_router(phase12_dashboard_router)  # Phase 12.4 routes
 
 # Mount static files for uploads
 from fastapi.staticfiles import StaticFiles
