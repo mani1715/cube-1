@@ -75,7 +75,7 @@ const CookieConsent = () => {
     setShowBanner(false);
 
     // Send consent to backend (optional)
-    fetch(`${import.meta.env.VITE_SUPABASE_URL || process.env.REACT_APP_BACKEND_URL}/api/phase9/compliance/cookie-consent`, {
+    fetch(`${import.meta.env.VITE_SUPABASE_URL || import.meta.env.REACT_APP_BACKEND_URL || ''}/api/phase9/compliance/cookie-consent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(prefs),
