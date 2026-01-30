@@ -48,6 +48,7 @@ export const Navbar = forwardRef<HTMLElement>((_, ref) => {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
+            <ThemeToggle />
             <Link to="/volunteer">
               <Button variant="outline" size="sm">
                 Volunteer
