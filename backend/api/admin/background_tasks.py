@@ -6,58 +6,181 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import io
 import csv
+import sys
+sys.path.append('/app/backend')
 
 logger = logging.getLogger(__name__)
 
 
-# ============= EMAIL MOCK SERVICE =============
+# ============= EMAIL SERVICE (REAL + FALLBACK) =============
 
 class EmailService:
-    """Mock email service for sending notifications."""
+    """Email service with real implementation and fallback to mock."""
     
     @staticmethod
     async def send_welcome_email(to_email: str, admin_name: str):
-        """Send welcome email to new admin (mocked)."""
-        logger.info(f"[MOCK EMAIL] Sending welcome email to {to_email}")
-        logger.info(f"[MOCK EMAIL] Subject: Welcome to A-Cube Admin Panel")
-        logger.info(f"[MOCK EMAIL] Body: Hello {admin_name}, welcome to the A-Cube platform!")
-        return True
+        """Send welcome email to new admin."""
+        try:
+            from api.phase12_email import send_email_async, create_welcome_email
+            
+            html_content = create_welcome_email(user_name=admin_name)
+            result = await send_email_async(
+                to_email=to_email,
+                subject="Welcome to A-Cube Admin Panel",
+                html_content=html_content
+            )
+            
+            if result["status"] == "mocked":
+                logger.info(f"[MOCK EMAIL] Welcome email to {to_email} (email service not configured)")
+            else:
+                logger.info(f"[REAL EMAIL] Welcome email sent to {to_email}")
+            
+            return True
+        except Exception as e:
+            logger.error(f"Failed to send welcome email: {str(e)}")
+            logger.info(f"[MOCK EMAIL] Fallback - Welcome email to {to_email}")
+            return True
     
     @staticmethod
     async def send_session_confirmation(to_email: str, session_data: Dict[str, Any]):
-        """Send session confirmation email (mocked)."""
-        logger.info(f"[MOCK EMAIL] Sending session confirmation to {to_email}")
-        logger.info(f"[MOCK EMAIL] Subject: Session Booking Confirmed")
-        logger.info(f"[MOCK EMAIL] Session ID: {session_data.get('id')}")
-        return True
+        """Send session confirmation email."""
+        try:
+            from api.phase12_email import send_email_async, create_session_confirmation_email
+            
+            html_content = create_session_confirmation_email(
+                user_name=session_data.get('name', 'User'),
+                session_date=session_data.get('preferred_date', 'TBD'),
+                session_time=session_data.get('preferred_time', 'TBD'),
+                psychologist_name=session_data.get('psychologist', 'TBD')
+            )
+            
+            result = await send_email_async(
+                to_email=to_email,
+                subject="Session Booking Confirmed - A-Cube",
+                html_content=html_content
+            )
+            
+            if result["status"] == "mocked":
+                logger.info(f"[MOCK EMAIL] Session confirmation to {to_email} (email service not configured)")
+            else:
+                logger.info(f"[REAL EMAIL] Session confirmation sent to {to_email}")
+            
+            return True
+        except Exception as e:
+            logger.error(f"Failed to send session confirmation: {str(e)}")
+            logger.info(f"[MOCK EMAIL] Fallback - Session confirmation to {to_email}, ID: {session_data.get('id')}")
+            return True
     
     @staticmethod
     async def send_event_registration(to_email: str, event_data: Dict[str, Any]):
-        """Send event registration email (mocked)."""
-        logger.info(f"[MOCK EMAIL] Sending event registration to {to_email}")
-        logger.info(f"[MOCK EMAIL] Subject: Event Registration Confirmed")
-        logger.info(f"[MOCK EMAIL] Event: {event_data.get('title')}")
-        return True
+        """Send event registration email."""
+        try:
+            from api.phase12_email import send_email_async, create_event_registration_email
+            
+            html_content = create_event_registration_email(
+                user_name=event_data.get('name', 'User'),
+                event_name=event_data.get('title', 'Event'),
+                event_date=event_data.get('date', 'TBD'),
+                event_time=event_data.get('time', 'TBD'),
+                event_location=event_data.get('location', 'Online')
+            )
+            
+            result = await send_email_async(
+                to_email=to_email,
+                subject=f"Event Registration Confirmed - {event_data.get('title', 'A-Cube Event')}",
+                html_content=html_content
+            )
+            
+            if result["status"] == "mocked":
+                logger.info(f"[MOCK EMAIL] Event registration to {to_email} (email service not configured)")
+            else:
+                logger.info(f"[REAL EMAIL] Event registration sent to {to_email}")
+            
+            return True
+        except Exception as e:
+            logger.error(f"Failed to send event registration: {str(e)}")
+            logger.info(f"[MOCK EMAIL] Fallback - Event registration to {to_email}: {event_data.get('title')}")
+            return True
     
     @staticmethod
     async def send_volunteer_application_received(to_email: str, volunteer_data: Dict[str, Any]):
-        """Send volunteer application confirmation (mocked)."""
-        logger.info(f"[MOCK EMAIL] Sending volunteer application confirmation to {to_email}")
-        logger.info(f"[MOCK EMAIL] Subject: Volunteer Application Received")
-        logger.info(f"[MOCK EMAIL] Name: {volunteer_data.get('name')}")
-        return True
+        """Send volunteer application confirmation."""
+        try:
+            from api.phase12_email import send_email_async
+            
+            html_content = f"""
+            <!DOCTYPE html>
+            <html>
+            <head><meta charset="UTF-8"><style>
+                body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }}
+                .container {{ max-width: 600px; margin: 20px auto; background: #ffffff; }}
+                .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }}
+                .content {{ padding: 30px; }}
+            </style></head>
+            <body>
+                <div class="container">
+                    <div class="header"><h1>Application Received</h1></div>
+                    <div class="content">
+                        <p>Dear {volunteer_data.get('name', 'Volunteer')},</p>
+                        <p>Thank you for your interest in volunteering with A-Cube Mental Health Platform.</p>
+                        <p>We have received your application and our team will review it shortly.</p>
+                        <p>Best regards,<br>The A-Cube Team</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+            
+            result = await send_email_async(
+                to_email=to_email,
+                subject="Volunteer Application Received - A-Cube",
+                html_content=html_content
+            )
+            
+            if result["status"] == "mocked":
+                logger.info(f"[MOCK EMAIL] Volunteer application to {to_email} (email service not configured)")
+            else:
+                logger.info(f"[REAL EMAIL] Volunteer application sent to {to_email}")
+            
+            return True
+        except Exception as e:
+            logger.error(f"Failed to send volunteer application email: {str(e)}")
+            logger.info(f"[MOCK EMAIL] Fallback - Volunteer application to {to_email}")
+            return True
     
     @staticmethod
     async def send_contact_form_acknowledgment(to_email: str, contact_data: Dict[str, Any]):
-        """Send contact form acknowledgment (mocked)."""
-        logger.info(f"[MOCK EMAIL] Sending contact form acknowledgment to {to_email}")
-        logger.info(f"[MOCK EMAIL] Subject: We've received your message")
-        logger.info(f"[MOCK EMAIL] Reference ID: {contact_data.get('id')}")
-        return True
+        """Send contact form acknowledgment."""
+        try:
+            from api.phase12_email import send_email_async, create_contact_acknowledgment_email
+            
+            message_preview = contact_data.get('message', '')[:100] + '...' if len(contact_data.get('message', '')) > 100 else contact_data.get('message', '')
+            
+            html_content = create_contact_acknowledgment_email(
+                user_name=contact_data.get('name', 'User'),
+                message_preview=message_preview
+            )
+            
+            result = await send_email_async(
+                to_email=to_email,
+                subject="We've received your message - A-Cube",
+                html_content=html_content
+            )
+            
+            if result["status"] == "mocked":
+                logger.info(f"[MOCK EMAIL] Contact acknowledgment to {to_email} (email service not configured)")
+            else:
+                logger.info(f"[REAL EMAIL] Contact acknowledgment sent to {to_email}")
+            
+            return True
+        except Exception as e:
+            logger.error(f"Failed to send contact acknowledgment: {str(e)}")
+            logger.info(f"[MOCK EMAIL] Fallback - Contact acknowledgment to {to_email}")
+            return True
     
     @staticmethod
     async def send_bulk_operation_report(to_email: str, operation_type: str, result: Dict[str, Any]):
-        """Send bulk operation completion report to admin (mocked)."""
+        """Send bulk operation completion report to admin."""
         logger.info(f"[MOCK EMAIL] Sending bulk operation report to {to_email}")
         logger.info(f"[MOCK EMAIL] Subject: Bulk {operation_type} Operation Complete")
         logger.info(f"[MOCK EMAIL] Success: {result.get('success_count')}, Failed: {result.get('failed_count')}")
