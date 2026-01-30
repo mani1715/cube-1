@@ -679,7 +679,7 @@ def main():
     
     # Exit code
     if passed == total and security_headers_ok:
-        print_success("\n🎉 All Phase 9 backend tests passed!")
+        print_success("\n🎉 All Phase 12 User Authentication and Phase 9 backend tests passed!")
         sys.exit(0)
     else:
         print_error(f"\n💥 {total - passed} tests failed. Please check the issues above.")
