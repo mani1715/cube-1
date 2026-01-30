@@ -11,7 +11,7 @@ from datetime import datetime
 import xml.etree.ElementTree as ET
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://cube-visualizer-3.preview.emergentagent.com"
+BACKEND_URL = "https://rubiks-master-3.preview.emergentagent.com"
 
 class Colors:
     GREEN = '\033[92m'
