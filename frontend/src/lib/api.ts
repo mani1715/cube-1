@@ -1,5 +1,5 @@
 // API Configuration
-const API_BASE_URL = import.meta.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || '';
+const API_BASE_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL || '';
 
 // Helper function for making API requests
 async function apiRequest(endpoint: string, options: RequestInit = {}) {
