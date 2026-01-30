@@ -63,13 +63,14 @@
   }
 
   .dark {
-    --background: 220 15% 10%;
+    /* Soft dark blue background - avoiding pure black */
+    --background: 220 15% 12%;
     --foreground: 40 20% 95%;
 
-    --card: 220 15% 12%;
+    --card: 220 15% 14%;
     --card-foreground: 40 20% 95%;
 
-    --popover: 220 15% 10%;
+    --popover: 220 15% 12%;
     --popover-foreground: 40 20% 95%;
 
     /* Orange primary remains vibrant in dark mode */
@@ -92,7 +93,18 @@
     --input: 220 12% 20%;
     --ring: 24 95% 58%;
 
-    --sidebar-background: 220 15% 10%;
+    /* Dark mode gradients - soft and subtle */
+    --gradient-hero: linear-gradient(135deg, hsl(220 15% 12%) 0%, hsl(220 15% 14%) 40%, hsl(220 12% 16%) 70%, hsl(24 50% 20% / 0.3) 100%);
+    --gradient-card: linear-gradient(165deg, hsl(220 15% 14%) 0%, hsl(220 12% 16%) 50%, hsl(220 10% 18%) 100%);
+    --gradient-cta: linear-gradient(135deg, hsl(24 95% 58%) 0%, hsl(20 90% 52%) 50%, hsl(16 85% 48%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(28 95% 62%) 0%, hsl(24 95% 58%) 50%, hsl(20 90% 52%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(24 50% 22%) 0%, hsl(24 45% 20%) 50%, hsl(24 40% 18%) 100%);
+    --gradient-warm: linear-gradient(180deg, hsl(220 15% 14%) 0%, hsl(220 12% 16%) 100%);
+    --shadow-soft: 0 4px 24px -4px hsl(0 0% 0% / 0.3);
+    --shadow-elevated: 0 12px 40px -8px hsl(0 0% 0% / 0.4);
+    --shadow-glow: 0 0 20px hsl(24 95% 58% / 0.4);
+
+    --sidebar-background: 220 15% 12%;
     --sidebar-foreground: 40 20% 95%;
     --sidebar-primary: 24 95% 58%;
     --sidebar-primary-foreground: 220 15% 10%;
