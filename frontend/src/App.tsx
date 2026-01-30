@@ -20,6 +20,11 @@ import Terms from "./pages/Terms";
 import DataExport from "./pages/DataExport";
 import AccountDeletion from "./pages/AccountDeletion";
 import NotFound from "./pages/NotFound";
+// User imports
+import { UserProvider } from "./contexts/UserContext";
+import UserLogin from "./pages/UserLogin";
+import UserSignup from "./pages/UserSignup";
+import UserDashboard from "./pages/UserDashboard";
 // Admin imports
 import { AdminProvider } from "./contexts/AdminContext";
 import AdminLayout from "./admin/AdminLayout";
