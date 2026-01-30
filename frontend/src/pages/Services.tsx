@@ -6,6 +6,8 @@ import { User, Users, BookOpen, Check, ArrowRight, Clock, Video, Shield, Heart, 
 import servicesBg from "@/assets/bg-services.jpg";
 import individualBg from "@/assets/bg-therapy-individual.jpg";
 import groupBg from "@/assets/bg-group-therapy.jpg";
+import TrustBadge from "@/components/TrustBadge";
+import PrivacyHighlights from "@/components/PrivacyHighlights";
 
 const services = [
   {
