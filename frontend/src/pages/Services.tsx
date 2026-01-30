@@ -258,8 +258,20 @@ const Services = () => {
               </ScrollReveal>
             ))}
           </div>
+
+          {/* Trust Badges */}
+          <ScrollReveal delay={300}>
+            <div className="flex flex-wrap justify-center gap-3 mt-12">
+              <TrustBadge type="licensed" size="md" />
+              <TrustBadge type="verified" size="md" />
+              <TrustBadge type="certified" size="md" />
+            </div>
+          </ScrollReveal>
         </div>
       </section>
+
+      {/* Privacy & Ethics - Phase 10.1 */}
+      <PrivacyHighlights />
 
       {/* CTA Section */}
       <section className="py-20 md:py-28">
