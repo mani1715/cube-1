@@ -33,7 +33,7 @@ const AccountDeletion = () => {
     setLoading(true);
     
     try {
-      const backendUrl = import.meta.env.VITE_SUPABASE_URL || process.env.REACT_APP_BACKEND_URL;
+      const backendUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.REACT_APP_BACKEND_URL || '';
       const response = await fetch(`${backendUrl}/api/phase9/compliance/account-deletion`, {
         method: 'POST',
         headers: {
