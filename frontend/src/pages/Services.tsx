@@ -215,9 +215,9 @@ const Services = () => {
                       <p className="text-sm text-muted-foreground">{service.whatToExpect}</p>
                     </div>
 
-                    <Link to="/book-session">
+                    <Link to={service.id === "articles" ? "/blogs" : "/book-session"}>
                       <Button variant="hero" className="w-full">
-                        Get Started
+                        {service.id === "articles" ? "Explore Articles" : "Get Started"}
                         <ArrowRight className="w-4 h-4" />
                       </Button>
                     </Link>
