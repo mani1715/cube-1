@@ -68,15 +68,24 @@ export const Footer = forwardRef<HTMLElement>((_, ref) => {
                 Supporting mental wellness through compassionate care and community.
               </p>
               <div className="flex gap-3">
-                {[Instagram, Linkedin, Youtube].map((Icon, i) => (
-                  <a
-                    key={i}
-                    href="#"
-                    className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 hover:text-primary-foreground transition-all duration-300 hover:scale-110"
-                  >
-                    <Icon className="w-4 h-4" />
-                  </a>
-                ))}
+                <a
+                  href="https://www.instagram.com/a_cubewellbeing/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 hover:text-primary-foreground transition-all duration-300 hover:scale-110"
+                  aria-label="Follow us on Instagram"
+                >
+                  <Instagram className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://www.linkedin.com/company/aasiya-mental-health-organization/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 hover:text-primary-foreground transition-all duration-300 hover:scale-110"
+                  aria-label="Connect with us on LinkedIn"
+                >
+                  <Linkedin className="w-4 h-4" />
+                </a>
               </div>
             </div>
 
