@@ -6,7 +6,7 @@ Data Persistence Verification Test
 import requests
 import json
 
-BASE_URL = "https://rubiks-master-3.preview.emergentagent.com/api"
+BASE_URL = "https://cube-hub.preview.emergentagent.com/api"
 
 def verify_data_persistence():
     """Verify that data is properly persisted in MongoDB"""
