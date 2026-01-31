@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
-import { ArrowRight, Clock, User, Tag } from "lucide-react";
+import { ArrowRight, Clock, User, Tag, Heart, Bookmark } from "lucide-react";
 import blogsBg from "@/assets/bg-blogs.jpg";
+import { useToast } from "@/hooks/use-toast";
 
 const featuredPost = {
+  id: "blog-featured-1",
   title: "Understanding the Connection Between Sleep and Mental Health",
   excerpt: "Sleep and mental health are deeply interconnected. Discover how improving your sleep habits can significantly impact your emotional well-being and cognitive function.",
   author: "Dr. Sarah Mitchell",
@@ -16,6 +18,7 @@ const featuredPost = {
 
 const posts = [
   {
+    id: "blog-1",
     title: "5 Mindfulness Techniques for Daily Stress Relief",
     excerpt: "Simple, practical mindfulness exercises you can incorporate into your daily routine to manage stress effectively.",
     author: "Dr. Emily Rodriguez",
@@ -24,6 +27,7 @@ const posts = [
     category: "Mindfulness",
   },
   {
+    id: "blog-2",
     title: "Navigating Anxiety in the Digital Age",
     excerpt: "How our constant connection to technology affects anxiety levels and strategies to create healthy digital boundaries.",
     author: "Dr. James Chen",
@@ -32,6 +36,7 @@ const posts = [
     category: "Anxiety",
   },
   {
+    id: "blog-3",
     title: "The Power of Vulnerability in Relationships",
     excerpt: "Why emotional vulnerability strengthens connections and how to practice it safely in your relationships.",
     author: "Dr. Sarah Mitchell",
@@ -40,6 +45,7 @@ const posts = [
     category: "Relationships",
   },
   {
+    id: "blog-4",
     title: "Building Resilience: Lessons from Cognitive Behavioral Therapy",
     excerpt: "Key CBT principles that can help you develop mental resilience and cope with life's challenges.",
     author: "Dr. Emily Rodriguez",
@@ -48,6 +54,7 @@ const posts = [
     category: "Therapy",
   },
   {
+    id: "blog-5",
     title: "Understanding Burnout: Signs, Causes, and Recovery",
     excerpt: "A comprehensive guide to recognizing burnout symptoms and evidence-based strategies for recovery.",
     author: "Michael Thompson",
@@ -56,6 +63,7 @@ const posts = [
     category: "Wellness",
   },
   {
+    id: "blog-6",
     title: "The Role of Community in Mental Health Recovery",
     excerpt: "How social connections and community support contribute to mental health healing and maintenance.",
     author: "Dr. James Chen",
@@ -69,6 +77,55 @@ const categories = ["All", "Wellness", "Mindfulness", "Anxiety", "Relationships"
 
 const Blogs = () => {
   const [activeCategory, setActiveCategory] = useState("All");
+  const [likedBlogs, setLikedBlogs] = useState<Set<string>>(new Set());
+  const [savedBlogs, setSavedBlogs] = useState<Set<string>>(new Set());
+  const { toast } = useToast();
+
+  // Load liked and saved blogs from localStorage on mount
+  useEffect(() => {
+    const liked = localStorage.getItem('likedBlogs');
+    const saved = localStorage.getItem('savedBlogs');
+    if (liked) setLikedBlogs(new Set(JSON.parse(liked)));
+    if (saved) setSavedBlogs(new Set(JSON.parse(saved)));
+  }, []);
+
+  const toggleLike = (blogId: string) => {
+    const newLikedBlogs = new Set(likedBlogs);
+    if (newLikedBlogs.has(blogId)) {
+      newLikedBlogs.delete(blogId);
+      toast({
+        title: "Removed from likes",
+        description: "Blog removed from your liked posts.",
+      });
+    } else {
+      newLikedBlogs.add(blogId);
+      toast({
+        title: "Added to likes",
+        description: "Blog added to your liked posts.",
+      });
+    }
+    setLikedBlogs(newLikedBlogs);
+    localStorage.setItem('likedBlogs', JSON.stringify([...newLikedBlogs]));
+  };
+
+  const toggleSave = (blogId: string) => {
+    const newSavedBlogs = new Set(savedBlogs);
+    if (newSavedBlogs.has(blogId)) {
+      newSavedBlogs.delete(blogId);
+      toast({
+        title: "Removed from saved",
+        description: "Blog removed from your saved posts.",
+      });
+    } else {
+      newSavedBlogs.add(blogId);
+      toast({
+        title: "Saved successfully",
+        description: "Blog saved to your reading list.",
+      });
+    }
+    setSavedBlogs(newSavedBlogs);
+    localStorage.setItem('savedBlogs', JSON.stringify([...newSavedBlogs]));
+  };
 
   const filteredPosts = activeCategory === "All" 
     ? posts 
@@ -145,9 +202,28 @@ const Blogs = () => {
                     {featuredPost.category}
                   </span>
                 </div>
-                <Button variant="hero">
-                  Read Article
-                  <ArrowRight className="w-4 h-4" />
+                <div className="flex items-center gap-4">
+                  <Button variant="hero">
+                    Read Article
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={() => toggleLike(featuredPost.id)}
+                    className={likedBlogs.has(featuredPost.id) ? "text-red-500 border-red-500" : ""}
+                  >
+                    <Heart className={`w-5 h-5 ${likedBlogs.has(featuredPost.id) ? "fill-current" : ""}`} />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={() => toggleSave(featuredPost.id)}
+                    className={savedBlogs.has(featuredPost.id) ? "text-blue-500 border-blue-500" : ""}
+                  >
+                    <Bookmark className={`w-5 h-5 ${savedBlogs.has(featuredPost.id) ? "fill-current" : ""}`} />
+                  </Button>
+                </div>
                 </Button>
               </div>
             </div>
@@ -167,19 +243,39 @@ const Blogs = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPosts.map((post, index) => (
               <ScrollReveal key={index} delay={index * 80}>
-                <article className="group p-6 rounded-2xl bg-background border border-border card-hover h-full">
-                  <span className="inline-block px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-medium mb-4">
+                <article className="group p-6 rounded-2xl bg-background border border-border card-hover h-full flex flex-col">
+                  <span className="inline-block px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-medium mb-4 w-fit">
                     {post.category}
                   </span>
                   <h3 className="font-display text-lg font-semibold text-foreground mb-3 group-hover:text-primary transition-colors duration-200">
                     {post.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2 flex-grow">
                     {post.excerpt}
                   </p>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
                     <span>{post.author}</span>
                     <span>{post.readTime}</span>
+                  </div>
+                  <div className="flex items-center gap-2 pt-4 border-t border-border">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => toggleLike(post.id)}
+                      className={`flex-1 ${likedBlogs.has(post.id) ? "text-red-500" : ""}`}
+                    >
+                      <Heart className={`w-4 h-4 ${likedBlogs.has(post.id) ? "fill-current" : ""}`} />
+                      {likedBlogs.has(post.id) ? "Liked" : "Like"}
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => toggleSave(post.id)}
+                      className={`flex-1 ${savedBlogs.has(post.id) ? "text-blue-500" : ""}`}
+                    >
+                      <Bookmark className={`w-4 h-4 ${savedBlogs.has(post.id) ? "fill-current" : ""}`} />
+                      {savedBlogs.has(post.id) ? "Saved" : "Save"}
+                    </Button>
                   </div>
                 </article>
               </ScrollReveal>
