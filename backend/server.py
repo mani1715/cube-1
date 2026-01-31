@@ -126,11 +126,25 @@ async def create_event(request: Request, event: EventCreate):
 @api_router.get("/events", response_model=List[Event])
 @limiter.limit(PUBLIC_RATE_LIMIT)
 async def get_all_events(request: Request, is_active: Optional[bool] = None):
-    """Get all events with optional active filter"""
+    """Get all events with optional active filter (Phase 13.1: Cached for 5 minutes)"""
     try:
+        # Generate cache key
+        cache_key = f"events:is_active={is_active}"
+        
+        # Try to get from cache
+        cached_result = cache.get(cache_key)
+        if cached_result is not None:
+            return cached_result
+        
+        # Query database
         query = {"is_active": is_active} if is_active is not None else {}
         events = await db.events.find(query).sort("date", -1).to_list(1000)
-        return [Event(**event) for event in events]
+        result = [Event(**event) for event in events]
+        
+        # Cache result for 5 minutes (300 seconds)
+        cache.set(cache_key, result, ttl=300)
+        
+        return result
     except Exception as e:
         logger.error(f"Error fetching events: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch events")
