@@ -25,6 +25,9 @@ import { UserProvider } from "./contexts/UserContext";
 import UserLogin from "./pages/UserLogin";
 import UserSignup from "./pages/UserSignup";
 import UserDashboard from "./pages/UserDashboard";
+import UserProfile from "./pages/UserProfile";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFailure from "./pages/PaymentFailure";
 // Admin imports
 import { AdminProvider } from "./contexts/AdminContext";
 import AdminLayout from "./admin/AdminLayout";
@@ -80,9 +83,13 @@ const App = () => (
             <Route path="/login" element={<UserLogin />} />
             <Route path="/signup" element={<UserSignup />} />
             
-            {/* User Dashboard Route (Public - Auth handled inside) */}
+            {/* User Dashboard Routes (Public - Auth handled inside) */}
             <Route path="/user/dashboard" element={<UserDashboard />} />
-            <Route path="/user/profile" element={<UserDashboard />} />
+            <Route path="/user/profile" element={<UserProfile />} />
+            
+            {/* Payment Routes (Public) */}
+            <Route path="/payment/success" element={<PaymentSuccess />} />
+            <Route path="/payment/failure" element={<PaymentFailure />} />
             
             {/* Admin Login Route (Public) */}
             <Route path="/admin/login" element={<AdminLogin />} />
