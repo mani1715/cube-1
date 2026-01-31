@@ -394,6 +394,230 @@ async def scalability_health_check(
                 "status": "unhealthy",
                 "error": str(e)
             }
+
+
+# ============================================================================
+# PHASE 14.2 - BACKUP & DISASTER RECOVERY
+# ============================================================================
+
+@router.post("/backup/create")
+async def create_database_backup(
+    background_tasks: BackgroundTasks,
+    backup_type: str = "manual",
+    collections: Optional[List[str]] = None,
+    admin = Depends(require_super_admin),
+    backup_mgr = Depends(get_backup_manager)
+):
+    """
+    Create a complete database backup
+    
+    - **backup_type**: Type of backup (manual, scheduled, pre-migration)
+    - **collections**: Optional list of specific collections to backup
+    
+    Returns backup metadata including backup ID and size
+    """
+    try:
+        # Run backup in background for large databases
+        result = await backup_mgr.create_backup(
+            backup_type=backup_type,
+            include_collections=collections
+        )
+        
+        if result.get("status") == "failed":
+            raise HTTPException(status_code=500, detail=result.get("error", "Backup failed"))
+        
+        logger.info(f"Backup created successfully: {result.get('backup_id')}")
+        
+        return {
+            "message": "Backup created successfully",
+            "backup": result
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Backup creation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to create backup: {str(e)}")
+
+
+@router.get("/backup/list")
+async def list_all_backups(
+    admin = Depends(require_super_admin),
+    backup_mgr = Depends(get_backup_manager)
+):
+    """
+    List all available database backups
+    
+    Returns list of backups with metadata, sorted by date (newest first)
+    """
+    try:
+        backups = await backup_mgr.list_backups()
+        
+        return {
+            "total_backups": len(backups),
+            "backups": backups
+        }
+    
+    except Exception as e:
+        logger.error(f"List backups error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to list backups: {str(e)}")
+
+
+@router.get("/backup/{backup_id}")
+async def get_backup_details(
+    backup_id: str,
+    admin = Depends(require_super_admin),
+    backup_mgr = Depends(get_backup_manager)
+):
+    """
+    Get detailed information about a specific backup
+    
+    Returns backup metadata, file listing, and collection details
+    """
+    try:
+        details = await backup_mgr.get_backup_details(backup_id)
+        
+        if details is None:
+            raise HTTPException(status_code=404, detail=f"Backup '{backup_id}' not found")
+        
+        return details
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Get backup details error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get backup details: {str(e)}")
+
+
+@router.post("/backup/{backup_id}/restore")
+async def restore_database_backup(
+    backup_id: str,
+    collections: Optional[List[str]] = None,
+    mode: str = "replace",
+    admin = Depends(require_super_admin),
+    backup_mgr = Depends(get_backup_manager)
+):
+    """
+    Restore database from a backup
+    
+    - **backup_id**: ID of backup to restore
+    - **collections**: Optional list of specific collections to restore
+    - **mode**: Restore mode
+        - `replace`: Drop existing data and restore (default)
+        - `merge`: Keep existing data, add backup data
+        - `preview`: Preview what would be restored without actually restoring
+    
+    ⚠️ **Warning**: `replace` mode will delete existing data!
+    """
+    try:
+        if mode not in ["replace", "merge", "preview"]:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid mode. Must be 'replace', 'merge', or 'preview'"
+            )
+        
+        result = await backup_mgr.restore_backup(
+            backup_id=backup_id,
+            collections=collections,
+            mode=mode
+        )
+        
+        if result.get("status") == "failed":
+            raise HTTPException(status_code=500, detail=result.get("error", "Restore failed"))
+        
+        message = "Restore preview completed" if mode == "preview" else "Database restored successfully"
+        
+        logger.info(f"Restore completed: {backup_id} (mode: {mode})")
+        
+        return {
+            "message": message,
+            "restore_results": result
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Restore error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to restore backup: {str(e)}")
+
+
+@router.delete("/backup/{backup_id}")
+async def delete_backup(
+    backup_id: str,
+    admin = Depends(require_super_admin),
+    backup_mgr = Depends(get_backup_manager)
+):
+    """
+    Delete a specific backup
+    
+    Permanently removes backup files from the system
+    """
+    try:
+        result = await backup_mgr.delete_backup(backup_id)
+        
+        if result.get("status") == "failed":
+            raise HTTPException(status_code=500, detail=result.get("error", "Deletion failed"))
+        
+        logger.info(f"Backup deleted: {backup_id}")
+        
+        return {
+            "message": f"Backup '{backup_id}' deleted successfully",
+            "result": result
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Delete backup error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete backup: {str(e)}")
+
+
+@router.post("/backup/cleanup")
+async def cleanup_old_backups(
+    admin = Depends(require_super_admin),
+    backup_mgr = Depends(get_backup_manager)
+):
+    """
+    Clean up old backups based on retention policy
+    
+    - Deletes backups older than 30 days
+    - Enforces maximum of 30 backups
+    
+    Returns list of deleted backups
+    """
+    try:
+        result = await backup_mgr.cleanup_old_backups()
+        
+        return {
+            "message": "Backup cleanup completed",
+            "deleted_count": result.get("deleted_count", 0),
+            "deleted_backups": result.get("deleted_backups", [])
+        }
+    
+    except Exception as e:
+        logger.error(f"Backup cleanup error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to cleanup backups: {str(e)}")
+
+
+@router.get("/backup/statistics")
+async def get_backup_statistics(
+    admin = Depends(require_super_admin),
+    backup_mgr = Depends(get_backup_manager)
+):
+    """
+    Get backup system statistics
+    
+    Returns total number of backups, storage usage, and configuration
+    """
+    try:
+        stats = backup_mgr.get_backup_statistics()
+        
+        return stats
+    
+    except Exception as e:
+        logger.error(f"Backup statistics error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get backup statistics: {str(e)}")
+
             health_status["status"] = "degraded"
         
         health_status["timestamp"] = datetime.utcnow().isoformat()
