@@ -88,44 +88,45 @@ const App = () => (
                     <Route path="/data-export" element={<DataExport />} />
                     <Route path="/account-deletion" element={<AccountDeletion />} />
             
-            {/* User Authentication Routes (Public) */}
-            <Route path="/login" element={<UserLogin />} />
-            <Route path="/signup" element={<UserSignup />} />
-            
-            {/* User Dashboard Routes (Public - Auth handled inside) */}
-            <Route path="/user/dashboard" element={<UserDashboard />} />
-            <Route path="/user/profile" element={<UserProfile />} />
-            
-            {/* Payment Routes (Public) */}
-            <Route path="/payment/success" element={<PaymentSuccess />} />
-            <Route path="/payment/failure" element={<PaymentFailure />} />
-            
-            {/* Admin Login Route (Public) */}
-            <Route path="/admin/login" element={<AdminLogin />} />
-            
-            {/* Protected Admin Routes */}
-            <Route element={<AdminProtectedRoute />}>
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<ErrorBoundary><AdminDashboard /></ErrorBoundary>} />
-                <Route path="sessions" element={<ErrorBoundary><AdminSessions /></ErrorBoundary>} />
-                <Route path="events" element={<ErrorBoundary><AdminEvents /></ErrorBoundary>} />
-                <Route path="blogs" element={<ErrorBoundary><AdminBlogs /></ErrorBoundary>} />
-                <Route path="psychologists" element={<ErrorBoundary><AdminPsychologists /></ErrorBoundary>} />
-                <Route path="volunteers" element={<ErrorBoundary><AdminVolunteers /></ErrorBoundary>} />
-                <Route path="jobs" element={<ErrorBoundary><AdminJobs /></ErrorBoundary>} />
-                <Route path="contacts" element={<ErrorBoundary><AdminContacts /></ErrorBoundary>} />
-                <Route path="logs" element={<ErrorBoundary><AdminLogs /></ErrorBoundary>} />
-                <Route path="errors" element={<ErrorBoundary><AdminErrors /></ErrorBoundary>} />
-                <Route path="settings" element={<ErrorBoundary><AdminSettings /></ErrorBoundary>} />
-              </Route>
-            </Route>
-            
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AdminProvider>
-      </UserProvider>
-      </BrowserRouter>
+                    {/* User Authentication Routes (Public) */}
+                    <Route path="/login" element={<UserLogin />} />
+                    <Route path="/signup" element={<UserSignup />} />
+                    
+                    {/* User Dashboard Routes (Public - Auth handled inside) */}
+                    <Route path="/user/dashboard" element={<UserDashboard />} />
+                    <Route path="/user/profile" element={<UserProfile />} />
+                    
+                    {/* Payment Routes (Public) */}
+                    <Route path="/payment/success" element={<PaymentSuccess />} />
+                    <Route path="/payment/failure" element={<PaymentFailure />} />
+                    
+                    {/* Admin Login Route (Public) */}
+                    <Route path="/admin/login" element={<AdminLogin />} />
+                    
+                    {/* Protected Admin Routes */}
+                    <Route element={<AdminProtectedRoute />}>
+                      <Route path="/admin" element={<AdminLayout />}>
+                        <Route index element={<ErrorBoundary><AdminDashboard /></ErrorBoundary>} />
+                        <Route path="sessions" element={<ErrorBoundary><AdminSessions /></ErrorBoundary>} />
+                        <Route path="events" element={<ErrorBoundary><AdminEvents /></ErrorBoundary>} />
+                        <Route path="blogs" element={<ErrorBoundary><AdminBlogs /></ErrorBoundary>} />
+                        <Route path="psychologists" element={<ErrorBoundary><AdminPsychologists /></ErrorBoundary>} />
+                        <Route path="volunteers" element={<ErrorBoundary><AdminVolunteers /></ErrorBoundary>} />
+                        <Route path="jobs" element={<ErrorBoundary><AdminJobs /></ErrorBoundary>} />
+                        <Route path="contacts" element={<ErrorBoundary><AdminContacts /></ErrorBoundary>} />
+                        <Route path="logs" element={<ErrorBoundary><AdminLogs /></ErrorBoundary>} />
+                        <Route path="errors" element={<ErrorBoundary><AdminErrors /></ErrorBoundary>} />
+                        <Route path="settings" element={<ErrorBoundary><AdminSettings /></ErrorBoundary>} />
+                      </Route>
+                    </Route>
+                    
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
+              </AdminProvider>
+            </UserProvider>
+          </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
   </ThemeProvider>
