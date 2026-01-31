@@ -12,7 +12,7 @@ from typing import Dict, Any, List
 import bcrypt
 
 # Backend URL from frontend/.env
-BASE_URL = "https://cube-sandbox.preview.emergentagent.com/api"
+BASE_URL = "https://rubiks-toolkit.preview.emergentagent.com/api"
 
 class Phase8Tester:
     def __init__(self):
