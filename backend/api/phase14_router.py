@@ -394,6 +394,18 @@ async def scalability_health_check(
                 "status": "unhealthy",
                 "error": str(e)
             }
+            health_status["status"] = "degraded"
+        
+        health_status["timestamp"] = datetime.utcnow().isoformat()
+        
+        return health_status
+    except Exception as e:
+        logger.error(f"Health check error: {str(e)}")
+        return {
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": datetime.utcnow().isoformat()
+        }
 
 
 # ============================================================================
