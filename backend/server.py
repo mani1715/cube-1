@@ -413,6 +413,22 @@ async def health_check():
     return {"status": "healthy", "service": "A-Cube Mental Health Platform API"}
 
 
+# ============= CACHE MANAGEMENT (Phase 13.1) =============
+from cache import cache
+
+@api_router.get("/cache/stats")
+async def get_cache_stats():
+    """Get cache statistics (Phase 13.1 Performance)"""
+    return cache.get_stats()
+
+
+@api_router.post("/cache/clear")
+async def clear_cache():
+    """Clear all cache entries - admin only (Phase 13.1 Performance)"""
+    cache.clear()
+    return {"message": "Cache cleared successfully"}
+
+
 @api_router.get("/")
 async def root():
     return {
