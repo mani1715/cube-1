@@ -9,9 +9,10 @@ import logging
 import razorpay
 from datetime import datetime
 from typing import Optional, List
-from fastapi import APIRouter, HTTPException, Request, Depends
+from fastapi import APIRouter, HTTPException, Request, Depends, BackgroundTasks
 from pydantic import BaseModel, Field
 from pymongo import MongoClient
+from api.phase12_email import send_email_async, create_payment_success_email
 
 # Logger setup
 logger = logging.getLogger(__name__)
@@ -126,7 +127,7 @@ async def create_payment_order(order_request: CreateOrderRequest):
 
 
 @phase12_payments_router.post("/verify-payment")
-async def verify_payment(verify_request: VerifyPaymentRequest):
+async def verify_payment(verify_request: VerifyPaymentRequest, background_tasks: BackgroundTasks):
     """
     Verify Razorpay payment signature and update transaction status
     """
@@ -166,6 +167,18 @@ async def verify_payment(verify_request: VerifyPaymentRequest):
         )
         
         logger.info(f"Payment verified successfully: {transaction['transaction_id']}")
+        
+        # Send payment success email in background
+        if transaction.get("user_email"):
+            background_tasks.add_task(
+                send_payment_success_email_task,
+                to_email=transaction["user_email"],
+                user_name=transaction.get("user_name", "Customer"),
+                transaction_id=transaction["transaction_id"],
+                amount=transaction["amount"],
+                item_name=transaction["item_name"],
+                payment_method=transaction.get("payment_method", "N/A")
+            )
         
         return {
             "success": True,
