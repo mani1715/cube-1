@@ -1177,13 +1177,14 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Production Health Check Endpoints"
-    - "SEO Sitemap & Robots.txt"
-    - "GDPR Compliance Endpoints"
-    - "Security Headers Middleware"
-    - "Google Analytics 4 Integration"
-    - "SEO Meta Tags Enhancement"
-    - "Structured Data (JSON-LD)"
+    - "Enhanced Connection Pool Management"
+    - "Advanced Caching System"
+    - "Query Optimization"
+    - "Batch Operations Optimizer"
+    - "Background Maintenance Tasks"
+    - "Performance Monitoring"
+    - "Database Statistics & Monitoring"
+    - "Scalability API Endpoints"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
