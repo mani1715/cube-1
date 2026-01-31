@@ -370,11 +370,25 @@ async def create_psychologist(psychologist: PsychologistCreate):
 
 @api_router.get("/psychologists", response_model=List[Psychologist])
 async def get_all_psychologists(is_active: Optional[bool] = None):
-    """Get all psychologist profiles with optional active filter"""
+    """Get all psychologist profiles with optional active filter (Phase 13.1: Cached for 10 minutes)"""
     try:
+        # Generate cache key
+        cache_key = f"psychologists:is_active={is_active}"
+        
+        # Try to get from cache
+        cached_result = cache.get(cache_key)
+        if cached_result is not None:
+            return cached_result
+        
+        # Query database
         query = {"is_active": is_active} if is_active is not None else {}
         psychologists = await db.psychologists.find(query).to_list(1000)
-        return [Psychologist(**psychologist) for psychologist in psychologists]
+        result = [Psychologist(**psychologist) for psychologist in psychologists]
+        
+        # Cache result for 10 minutes (600 seconds)
+        cache.set(cache_key, result, ttl=600)
+        
+        return result
     except Exception as e:
         logger.error(f"Error fetching psychologists: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch psychologists")
