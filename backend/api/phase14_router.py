@@ -630,15 +630,3 @@ async def get_backup_statistics(
         logger.error(f"Backup statistics error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to get backup statistics: {str(e)}")
 
-            health_status["status"] = "degraded"
-        
-        health_status["timestamp"] = datetime.utcnow().isoformat()
-        
-        return health_status
-    except Exception as e:
-        logger.error(f"Health check error: {str(e)}")
-        return {
-            "status": "unhealthy",
-            "error": str(e),
-            "timestamp": datetime.utcnow().isoformat()
-        }
