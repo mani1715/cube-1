@@ -72,20 +72,21 @@ const App = () => (
           <BrowserRouter>
             <UserProvider>
               <AdminProvider>
-                <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/services" element={<Services />} />
-              <Route path="/book-session" element={<BookSession />} />
-              <Route path="/events" element={<Events />} />
-              <Route path="/blogs" element={<Blogs />} />
-              <Route path="/careers" element={<Careers />} />
-              <Route path="/psychologist-portal" element={<PsychologistPortal />} />
-              <Route path="/volunteer" element={<Volunteer />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/data-export" element={<DataExport />} />
-              <Route path="/account-deletion" element={<AccountDeletion />} />
+                <Suspense fallback={<LoadingSpinner />}>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/services" element={<Services />} />
+                    <Route path="/book-session" element={<BookSession />} />
+                    <Route path="/events" element={<Events />} />
+                    <Route path="/blogs" element={<Blogs />} />
+                    <Route path="/careers" element={<Careers />} />
+                    <Route path="/psychologist-portal" element={<PsychologistPortal />} />
+                    <Route path="/volunteer" element={<Volunteer />} />
+                    <Route path="/privacy" element={<Privacy />} />
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/data-export" element={<DataExport />} />
+                    <Route path="/account-deletion" element={<AccountDeletion />} />
             
             {/* User Authentication Routes (Public) */}
             <Route path="/login" element={<UserLogin />} />
