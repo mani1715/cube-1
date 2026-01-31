@@ -351,3 +351,38 @@ async def get_payment_config():
         "currency": "INR",
         "payment_methods": ["card", "upi", "netbanking", "wallet"]
     }
+
+
+
+# ==================== EMAIL HELPER FUNCTION ====================
+
+async def send_payment_success_email_task(
+    to_email: str,
+    user_name: str,
+    transaction_id: str,
+    amount: float,
+    item_name: str,
+    payment_method: str
+):
+    """
+    Background task to send payment success email
+    """
+    try:
+        html_content = create_payment_success_email(
+            user_name=user_name,
+            transaction_id=transaction_id,
+            amount=amount,
+            item_name=item_name,
+            payment_method=payment_method
+        )
+        
+        await send_email_async(
+            to_email=to_email,
+            subject=f"Payment Successful - {item_name}",
+            html_content=html_content
+        )
+        
+        logger.info(f"Payment success email sent to {to_email}")
+    except Exception as e:
+        logger.error(f"Failed to send payment success email: {str(e)}")
+
