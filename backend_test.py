@@ -912,7 +912,7 @@ def test_phase12_user_authentication():
 
 def main():
     """Main testing function"""
-    print_header("PHASE 12 USER AUTHENTICATION TESTING")
+    print_header("PHASE 14.1 SCALABILITY & INFRASTRUCTURE TESTING")
     print_info(f"Testing backend at: {BACKEND_URL}")
     print_info(f"Test started at: {datetime.now().isoformat()}")
     
@@ -920,6 +920,10 @@ def main():
     
     # Run all tests
     try:
+        # Test Phase 14.1 Scalability & Infrastructure
+        phase14_results = test_phase14_scalability_endpoints()
+        all_results.update(phase14_results)
+        
         # Test Phase 12 User Authentication
         phase12_results = test_phase12_user_authentication()
         all_results.update(phase12_results)
@@ -969,7 +973,7 @@ def main():
     
     # Exit code
     if passed == total and security_headers_ok:
-        print_success("\n🎉 All Phase 12 User Authentication and Phase 9 backend tests passed!")
+        print_success("\n🎉 All Phase 14.1 Scalability and backend tests passed!")
         sys.exit(0)
     else:
         print_error(f"\n💥 {total - passed} tests failed. Please check the issues above.")
