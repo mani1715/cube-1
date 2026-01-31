@@ -26,10 +26,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowRight, Heart, Shield, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Heart, Shield, CheckCircle2, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import servicesBg from "@/assets/bg-services.jpg";
 import { sessionAPI } from "@/lib/api";
+import { useRazorpay } from "@/hooks/useRazorpay";
 
 const concerns = [
   { id: "anxiety", label: "Anxiety or worry" },
@@ -63,7 +64,10 @@ type FormData = z.infer<typeof formSchema>;
 
 const BookSession = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [sessionId, setSessionId] = useState<string>("");
+  const [sessionData, setSessionData] = useState<any>(null);
   const { toast } = useToast();
+  const { openPayment, isLoading: isPaymentLoading } = useRazorpay();
   
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -101,8 +105,10 @@ const BookSession = () => {
         consent: data.consent
       };
 
-      await sessionAPI.bookSession(bookingData);
+      const response = await sessionAPI.bookSession(bookingData);
       
+      setSessionId(response.id);
+      setSessionData({ ...bookingData, ...response });
       setIsSubmitted(true);
       toast({
         title: "Request Submitted",
@@ -116,6 +122,27 @@ const BookSession = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handlePayNow = () => {
+    if (!sessionId || !sessionData) return;
+
+    openPayment({
+      amount: 499, // Session booking fee in INR
+      item_type: 'session',
+      item_id: sessionId,
+      item_name: 'Therapy Session Booking',
+      user_email: sessionData.email,
+      user_name: sessionData.full_name,
+      user_phone: sessionData.phone,
+      onSuccess: (transactionId) => {
+        console.log('Payment successful:', transactionId);
+        // You can redirect to payment success page or update UI
+      },
+      onFailure: (error) => {
+        console.error('Payment failed:', error);
+      },
+    });
   };
 
   if (isSubmitted) {
@@ -141,10 +168,31 @@ const BookSession = () => {
               <p className="text-sm text-muted-foreground mb-8">
                 Taking this step takes courage. We're honored to be part of your healing journey.
               </p>
-              <Button variant="hero" onClick={() => window.location.href = "/"}>
-                Return Home
-                <ArrowRight className="w-4 h-4" />
-              </Button>
+              
+              {/* Payment Option */}
+              <div className="bg-accent/50 rounded-xl p-6 mb-8">
+                <h3 className="font-semibold text-lg mb-2">Complete Your Booking</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Pay ₹499 now to secure your session slot instantly.
+                </p>
+                <Button 
+                  variant="hero" 
+                  size="lg"
+                  onClick={handlePayNow}
+                  disabled={isPaymentLoading}
+                  className="w-full sm:w-auto"
+                >
+                  <CreditCard className="w-4 h-4" />
+                  {isPaymentLoading ? "Processing..." : "Pay Now ₹499"}
+                </Button>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button variant="outline" onClick={() => window.location.href = "/"}>
+                  Return Home
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </section>
