@@ -346,8 +346,8 @@ async def get_payment_config():
     Returns Razorpay Key ID needed for frontend integration
     """
     return {
-        "razorpay_enabled": bool(RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET),
-        "razorpay_key_id": RAZORPAY_KEY_ID if RAZORPAY_KEY_ID else None,
+        "enabled": bool(RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET and RAZORPAY_KEY_ID != "your_razorpay_key_id_here"),
+        "key_id": RAZORPAY_KEY_ID if RAZORPAY_KEY_ID and RAZORPAY_KEY_ID != "your_razorpay_key_id_here" else None,
         "currency": "INR",
         "payment_methods": ["card", "upi", "netbanking", "wallet"]
     }
