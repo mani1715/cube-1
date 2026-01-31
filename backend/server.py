@@ -211,8 +211,17 @@ async def create_blog(blog: BlogCreate):
 
 @api_router.get("/blogs", response_model=List[Blog])
 async def get_all_blogs(category: Optional[str] = None, featured: Optional[bool] = None):
-    """Get all blog posts with optional filters"""
+    """Get all blog posts with optional filters (Phase 13.1: Cached for 5 minutes)"""
     try:
+        # Generate cache key
+        cache_key = f"blogs:category={category}:featured={featured}"
+        
+        # Try to get from cache
+        cached_result = cache.get(cache_key)
+        if cached_result is not None:
+            return cached_result
+        
+        # Query database
         query = {}
         if category:
             query["category"] = category
@@ -220,7 +229,12 @@ async def get_all_blogs(category: Optional[str] = None, featured: Optional[bool]
             query["featured"] = featured
         
         blogs = await db.blogs.find(query).sort("date", -1).to_list(1000)
-        return [Blog(**blog) for blog in blogs]
+        result = [Blog(**blog) for blog in blogs]
+        
+        # Cache result for 5 minutes (300 seconds)
+        cache.set(cache_key, result, ttl=300)
+        
+        return result
     except Exception as e:
         logger.error(f"Error fetching blogs: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch blogs")
