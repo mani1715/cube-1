@@ -224,7 +224,6 @@ const Blogs = () => {
                     <Bookmark className={`w-5 h-5 ${savedBlogs.has(featuredPost.id) ? "fill-current" : ""}`} />
                   </Button>
                 </div>
-                </Button>
               </div>
             </div>
           </ScrollReveal>
