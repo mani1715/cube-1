@@ -112,13 +112,11 @@ async def create_payment_order(order_request: CreateOrderRequest):
         logger.info(f"Payment order created: {transaction_id} for {order_request.item_type} - {order_request.item_id}")
         
         return {
-            "success": True,
             "transaction_id": transaction_id,
-            "order_id": razorpay_order["id"],
+            "razorpay_order_id": razorpay_order["id"],
             "amount": order_request.amount,
-            "amount_paise": amount_paise,
             "currency": "INR",
-            "key_id": RAZORPAY_KEY_ID  # Frontend needs this to open Razorpay checkout
+            "razorpay_key_id": RAZORPAY_KEY_ID
         }
         
     except Exception as e:
@@ -182,8 +180,8 @@ async def verify_payment(verify_request: VerifyPaymentRequest, background_tasks:
         
         return {
             "success": True,
-            "message": "Payment verified successfully",
-            "transaction": transaction
+            "transaction_id": transaction["transaction_id"],
+            "message": "Payment verified successfully"
         }
         
     except razorpay.errors.SignatureVerificationError:
