@@ -265,11 +265,25 @@ async def create_job_posting(job: CareerCreate):
 
 @api_router.get("/careers", response_model=List[Career])
 async def get_all_jobs(is_active: Optional[bool] = None):
-    """Get all job postings with optional active filter"""
+    """Get all job postings with optional active filter (Phase 13.1: Cached for 10 minutes)"""
     try:
+        # Generate cache key
+        cache_key = f"careers:is_active={is_active}"
+        
+        # Try to get from cache
+        cached_result = cache.get(cache_key)
+        if cached_result is not None:
+            return cached_result
+        
+        # Query database
         query = {"is_active": is_active} if is_active is not None else {}
         jobs = await db.careers.find(query).sort("posted_at", -1).to_list(1000)
-        return [Career(**job) for job in jobs]
+        result = [Career(**job) for job in jobs]
+        
+        # Cache result for 10 minutes (600 seconds)
+        cache.set(cache_key, result, ttl=600)
+        
+        return result
     except Exception as e:
         logger.error(f"Error fetching job postings: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch job postings")
