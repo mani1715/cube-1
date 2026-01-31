@@ -512,6 +512,7 @@ from api.phase12_payments import phase12_payments_router  # Phase 12.1 - Payment
 from api.phase12_email import phase12_email_router  # Phase 12.2 - Email
 from api.phase12_users import phase12_users_router  # Phase 12.3 - User Auth
 from api.phase12_dashboard import phase12_dashboard_router  # Phase 12.4 - Dashboard
+from api.phase14_router import router as phase14_router  # Phase 14.1 - Scalability
 app.include_router(admin_router)
 app.include_router(auth_router)
 app.include_router(bulk_router)
@@ -526,6 +527,7 @@ app.include_router(phase12_payments_router)  # Phase 12.1 routes
 app.include_router(phase12_email_router)  # Phase 12.2 routes
 app.include_router(phase12_users_router)  # Phase 12.3 routes
 app.include_router(phase12_dashboard_router)  # Phase 12.4 routes
+app.include_router(phase14_router)  # Phase 14.1 routes
 
 # Mount static files for uploads
 from fastapi.staticfiles import StaticFiles
