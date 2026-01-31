@@ -475,6 +475,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Phase 13.1 - Compression Middleware for Performance
+from starlette.middleware.gzip import GZipMiddleware
+
+# Add GZip compression for responses > 500 bytes
+app.add_middleware(GZipMiddleware, minimum_size=500)
+
 # Security Headers Middleware (Phase 9.7 - Final Hardening)
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response as StarletteResponse
