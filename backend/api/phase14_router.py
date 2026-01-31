@@ -1,9 +1,9 @@
 """
-Phase 14.1 - Scalability & Infrastructure Router
-API endpoints for scalability monitoring and management
+Phase 14 - Scalability, Backup & Infrastructure Router
+API endpoints for scalability monitoring, backup management, and infrastructure
 """
 from fastapi import APIRouter, Depends, HTTPException, Request, BackgroundTasks
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from datetime import datetime
 import os
 import logging
@@ -18,11 +18,12 @@ from api.phase14_scalability import (
     performance_monitor,
     get_database_stats
 )
+from api.phase14_backup import BackupManager
 from cache import cache
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/phase14", tags=["Phase 14 - Scalability"])
+router = APIRouter(prefix="/api/phase14", tags=["Phase 14 - Scalability & Backup"])
 
 # Get MongoDB connection from environment
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -33,10 +34,22 @@ db_name = os.environ['DB_NAME']
 # Initialize connection pool (will be used by dependency injection)
 db_pool = DatabaseConnectionPool(mongo_url, db_name, max_pool_size=50, min_pool_size=10)
 
+# Initialize backup manager
+backup_manager = None
+
 
 def get_db():
     """Dependency to get database instance"""
     return db_pool.get_db()
+
+
+def get_backup_manager():
+    """Dependency to get backup manager instance"""
+    global backup_manager
+    if backup_manager is None:
+        db = db_pool.get_db()
+        backup_manager = BackupManager(db)
+    return backup_manager
 
 
 # ============= CONNECTION POOL HEALTH =============
