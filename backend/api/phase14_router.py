@@ -630,3 +630,244 @@ async def get_backup_statistics(
         logger.error(f"Backup statistics error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to get backup statistics: {str(e)}")
 
+
+# ============================================================================
+# PHASE 14.6 - ADMIN POWER TOOLS
+# ============================================================================
+
+from api.phase14_power_tools import (
+    AdvancedSearchFilter,
+    BulkDataExporter,
+    DataValidator,
+    QuickActions
+)
+
+
+@router.post("/power-tools/advanced-search/{collection}")
+async def advanced_search(
+    collection: str,
+    filters: Dict[str, Any],
+    page: int = 1,
+    limit: int = 50,
+    admin = Depends(require_super_admin),
+    db = Depends(get_db)
+):
+    """
+    Advanced search with complex filters
+    
+    Supports:
+    - Text search across multiple fields
+    - Date range filtering
+    - Status filters
+    - Custom field filters
+    - Pagination
+    """
+    try:
+        if collection not in await db.list_collection_names():
+            raise HTTPException(status_code=404, detail=f"Collection '{collection}' not found")
+        
+        coll = db[collection]
+        
+        # Build query from filters
+        query = AdvancedSearchFilter.build_query(filters)
+        
+        # Get total count
+        total = await coll.count_documents(query)
+        
+        # Apply pagination
+        skip = (page - 1) * limit
+        results = await coll.find(query).skip(skip).limit(limit).to_list(length=limit)
+        
+        return {
+            "collection": collection,
+            "filters_applied": filters,
+            "results": results,
+            "pagination": {
+                "page": page,
+                "limit": limit,
+                "total": total,
+                "total_pages": (total + limit - 1) // limit
+            }
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Advanced search error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
+
+
+@router.post("/power-tools/bulk-export/{collection}")
+async def bulk_export_data(
+    collection: str,
+    format: str = "csv",
+    filters: Optional[Dict[str, Any]] = None,
+    fields: Optional[List[str]] = None,
+    admin = Depends(require_super_admin),
+    db = Depends(get_db)
+):
+    """
+    Bulk export data from collection
+    
+    - **collection**: Name of collection to export
+    - **format**: Export format (csv or json)
+    - **filters**: Optional filters to apply
+    - **fields**: Optional list of fields to include (CSV only)
+    """
+    try:
+        if collection not in await db.list_collection_names():
+            raise HTTPException(status_code=404, detail=f"Collection '{collection}' not found")
+        
+        coll = db[collection]
+        
+        # Build query
+        query = AdvancedSearchFilter.build_query(filters or {})
+        
+        # Fetch data
+        data = await coll.find(query).to_list(length=None)
+        
+        if not data:
+            raise HTTPException(status_code=404, detail="No data found to export")
+        
+        # Default fields if not specified
+        if fields is None and format == "csv":
+            # Get all unique keys from first few documents
+            fields = list(set().union(*[doc.keys() for doc in data[:10]]))
+            # Remove MongoDB internal fields
+            fields = [f for f in fields if f not in ["_id", "password", "password_hash"]]
+        
+        # Export based on format
+        if format == "csv":
+            return await BulkDataExporter.export_to_csv(data, fields)
+        elif format == "json":
+            return await BulkDataExporter.export_to_json(data)
+        else:
+            raise HTTPException(status_code=400, detail="Invalid format. Use 'csv' or 'json'")
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Bulk export error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Export failed: {str(e)}")
+
+
+@router.post("/power-tools/validate/{collection}")
+async def validate_collection_data(
+    collection: str,
+    admin = Depends(require_super_admin),
+    db = Depends(get_db)
+):
+    """
+    Validate data integrity in a collection
+    
+    Checks for:
+    - Missing required fields
+    - Invalid email formats
+    - Invalid date types
+    - Duplicate entries
+    """
+    try:
+        if collection not in await db.list_collection_names():
+            raise HTTPException(status_code=404, detail=f"Collection '{collection}' not found")
+        
+        validation_results = await DataValidator.validate_collection(db, collection)
+        
+        return validation_results
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Validation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Validation failed: {str(e)}")
+
+
+@router.post("/power-tools/fix-issues/{collection}")
+async def fix_data_issues(
+    collection: str,
+    issue_type: str,
+    admin = Depends(require_super_admin),
+    db = Depends(get_db)
+):
+    """
+    Automatically fix common data issues
+    
+    - **issue_type**: Type of issue to fix
+        - `missing_timestamps`: Add created_at to documents missing it
+        - `normalize_status`: Standardize status values to lowercase
+        - `remove_deleted`: Permanently delete soft-deleted records older than 90 days
+    """
+    try:
+        if collection not in await db.list_collection_names():
+            raise HTTPException(status_code=404, detail=f"Collection '{collection}' not found")
+        
+        if issue_type not in ["missing_timestamps", "normalize_status", "remove_deleted"]:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid issue_type. Must be 'missing_timestamps', 'normalize_status', or 'remove_deleted'"
+            )
+        
+        result = await DataValidator.fix_common_issues(db, collection, issue_type)
+        
+        return {
+            "message": f"Fixed {result['fixed_count']} issues",
+            "details": result
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Fix issues error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to fix issues: {str(e)}")
+
+
+@router.get("/power-tools/dashboard")
+async def get_admin_dashboard(
+    admin = Depends(require_super_admin),
+    db = Depends(get_db)
+):
+    """
+    Get comprehensive admin dashboard
+    
+    Returns:
+    - Quick statistics for all collections
+    - Pending actions requiring attention
+    - Recent activity summary
+    """
+    try:
+        stats = await QuickActions.get_dashboard_stats(db)
+        pending = await QuickActions.get_pending_actions(db)
+        
+        return {
+            "statistics": stats,
+            "pending_actions": pending,
+            "timestamp": datetime.utcnow()
+        }
+    
+    except Exception as e:
+        logger.error(f"Dashboard error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to load dashboard: {str(e)}")
+
+
+@router.get("/power-tools/pending-actions")
+async def get_pending_actions_list(
+    admin = Depends(require_super_admin),
+    db = Depends(get_db)
+):
+    """
+    Get list of items requiring admin attention
+    
+    Returns counts of:
+    - Pending session bookings
+    - Pending volunteer applications
+    - Unread contact forms
+    - Pending approval requests
+    """
+    try:
+        pending = await QuickActions.get_pending_actions(db)
+        
+        return pending
+    
+    except Exception as e:
+        logger.error(f"Pending actions error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get pending actions: {str(e)}")
+
