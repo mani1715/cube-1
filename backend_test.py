@@ -408,6 +408,295 @@ def test_security_headers_comprehensive():
     
     return all_headers_ok
 
+def test_phase14_scalability_endpoints():
+    """Test Phase 14.1 Scalability & Infrastructure Endpoints"""
+    print_header("PHASE 14.1 - SCALABILITY & INFRASTRUCTURE ENDPOINTS")
+    
+    results = {}
+    admin_token = None
+    
+    # First, get admin authentication token
+    print_info("Getting admin authentication token...")
+    try:
+        # Try to login as super_admin (assuming default admin exists)
+        login_data = {
+            "email": "admin@acube.com",
+            "password": "admin123"
+        }
+        
+        response = requests.post(
+            f"{BACKEND_URL}/api/admin/auth/login",
+            json=login_data,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            admin_token = data.get('access_token')
+            print_success("Admin authentication successful")
+        else:
+            print_warning(f"Admin login failed with status {response.status_code}")
+            print_warning("Will test public endpoints only")
+    except Exception as e:
+        print_warning(f"Admin login error: {str(e)}")
+        print_warning("Will test public endpoints only")
+    
+    # Test 1: Public Health Check (no auth required)
+    print_info("Testing Scalability Health Check: /api/phase14/scalability/health")
+    try:
+        response = requests.get(f"{BACKEND_URL}/api/phase14/scalability/health", timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Scalability Health Check - Status: 200")
+            
+            if data.get('status') in ['healthy', 'degraded', 'unhealthy']:
+                print_success(f"  Health status: {data.get('status')}")
+            
+            if 'components' in data:
+                components = data['components']
+                if 'database' in components:
+                    db_status = components['database'].get('status')
+                    print_success(f"  Database component: {db_status}")
+                if 'cache' in components:
+                    cache_status = components['cache'].get('status')
+                    print_success(f"  Cache component: {cache_status}")
+            
+            if 'timestamp' in data:
+                print_success("  Timestamp included")
+            
+            check_security_headers(response, "Scalability Health Check")
+            results['/api/phase14/scalability/health'] = True
+            
+        else:
+            print_error(f"Scalability Health Check - Status: {response.status_code}")
+            print_error(f"  Response: {response.text}")
+            results['/api/phase14/scalability/health'] = False
+            
+    except Exception as e:
+        print_error(f"Scalability Health Check - Error: {str(e)}")
+        results['/api/phase14/scalability/health'] = False
+    
+    # Admin endpoints (require authentication)
+    if admin_token:
+        headers = {"Authorization": f"Bearer {admin_token}"}
+        
+        # Test 2: Cache Statistics
+        print_info("Testing Cache Statistics: /api/phase14/scalability/cache/stats")
+        try:
+            response = requests.get(
+                f"{BACKEND_URL}/api/phase14/scalability/cache/stats",
+                headers=headers,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                print_success("Cache Statistics - Status: 200")
+                
+                if 'cache_stats' in data:
+                    cache_stats = data['cache_stats']
+                    print_success(f"  Cache hit rate: {cache_stats.get('hit_rate', 0)}")
+                    print_success(f"  Cache size: {cache_stats.get('cache_size', 0)}")
+                    print_success(f"  Total requests: {cache_stats.get('total_requests', 0)}")
+                
+                if 'timestamp' in data:
+                    print_success("  Timestamp included")
+                
+                check_security_headers(response, "Cache Statistics")
+                results['/api/phase14/scalability/cache/stats'] = True
+                
+            else:
+                print_error(f"Cache Statistics - Status: {response.status_code}")
+                print_error(f"  Response: {response.text}")
+                results['/api/phase14/scalability/cache/stats'] = False
+                
+        except Exception as e:
+            print_error(f"Cache Statistics - Error: {str(e)}")
+            results['/api/phase14/scalability/cache/stats'] = False
+        
+        # Test 3: Scalability Overview
+        print_info("Testing Scalability Overview: /api/phase14/scalability/overview")
+        try:
+            response = requests.get(
+                f"{BACKEND_URL}/api/phase14/scalability/overview",
+                headers=headers,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                print_success("Scalability Overview - Status: 200")
+                
+                if 'connection_pool' in data:
+                    pool = data['connection_pool']
+                    print_success(f"  Connection pool status: {pool.get('status')}")
+                    print_success(f"  Pool response time: {pool.get('response_time_ms')}ms")
+                
+                if 'cache' in data:
+                    cache = data['cache']
+                    print_success(f"  Cache hit rate: {cache.get('hit_rate')}")
+                    print_success(f"  Cache entries: {cache.get('total_entries')}")
+                
+                if 'performance' in data:
+                    perf = data['performance']
+                    print_success(f"  Total requests: {perf.get('total_requests')}")
+                    print_success(f"  Avg response time: {perf.get('avg_response_time')}s")
+                
+                if 'optimizations_enabled' in data:
+                    optimizations = data['optimizations_enabled']
+                    print_success(f"  Optimizations: {len(optimizations)} enabled")
+                
+                check_security_headers(response, "Scalability Overview")
+                results['/api/phase14/scalability/overview'] = True
+                
+            else:
+                print_error(f"Scalability Overview - Status: {response.status_code}")
+                print_error(f"  Response: {response.text}")
+                results['/api/phase14/scalability/overview'] = False
+                
+        except Exception as e:
+            print_error(f"Scalability Overview - Error: {str(e)}")
+            results['/api/phase14/scalability/overview'] = False
+        
+        # Test 4: Scalability Configuration
+        print_info("Testing Scalability Configuration: /api/phase14/scalability/config")
+        try:
+            response = requests.get(
+                f"{BACKEND_URL}/api/phase14/scalability/config",
+                headers=headers,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                print_success("Scalability Configuration - Status: 200")
+                
+                if 'connection_pool' in data:
+                    pool_config = data['connection_pool']
+                    print_success(f"  Max pool size: {pool_config.get('max_pool_size')}")
+                    print_success(f"  Min pool size: {pool_config.get('min_pool_size')}")
+                
+                if 'cache_ttl_seconds' in data:
+                    cache_ttl = data['cache_ttl_seconds']
+                    print_success(f"  Cache TTL configs: {len(cache_ttl)} types")
+                    print_info(f"    Events TTL: {cache_ttl.get('events')}s")
+                    print_info(f"    Sessions TTL: {cache_ttl.get('sessions')}s")
+                
+                if 'compression' in data:
+                    compression = data['compression']
+                    print_success(f"  Compression enabled: {compression.get('enabled')}")
+                
+                if 'batch_operations' in data:
+                    batch = data['batch_operations']
+                    print_success(f"  Insert batch size: {batch.get('insert_batch_size')}")
+                
+                check_security_headers(response, "Scalability Configuration")
+                results['/api/phase14/scalability/config'] = True
+                
+            else:
+                print_error(f"Scalability Configuration - Status: {response.status_code}")
+                print_error(f"  Response: {response.text}")
+                results['/api/phase14/scalability/config'] = False
+                
+        except Exception as e:
+            print_error(f"Scalability Configuration - Error: {str(e)}")
+            results['/api/phase14/scalability/config'] = False
+        
+        # Test 5: Connection Pool Health
+        print_info("Testing Connection Pool Health: /api/phase14/scalability/connection-pool/health")
+        try:
+            response = requests.get(
+                f"{BACKEND_URL}/api/phase14/scalability/connection-pool/health",
+                headers=headers,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                print_success("Connection Pool Health - Status: 200")
+                
+                if data.get('status') in ['healthy', 'unhealthy']:
+                    print_success(f"  Pool status: {data.get('status')}")
+                
+                if 'response_time_ms' in data:
+                    print_success(f"  Response time: {data.get('response_time_ms')}ms")
+                
+                if 'max_pool_size' in data:
+                    print_success(f"  Max pool size: {data.get('max_pool_size')}")
+                
+                if 'stats' in data:
+                    print_success("  Pool statistics included")
+                
+                check_security_headers(response, "Connection Pool Health")
+                results['/api/phase14/scalability/connection-pool/health'] = True
+                
+            else:
+                print_error(f"Connection Pool Health - Status: {response.status_code}")
+                print_error(f"  Response: {response.text}")
+                results['/api/phase14/scalability/connection-pool/health'] = False
+                
+        except Exception as e:
+            print_error(f"Connection Pool Health - Error: {str(e)}")
+            results['/api/phase14/scalability/connection-pool/health'] = False
+        
+        # Test 6: Database Statistics
+        print_info("Testing Database Statistics: /api/phase14/scalability/database/stats")
+        try:
+            response = requests.get(
+                f"{BACKEND_URL}/api/phase14/scalability/database/stats",
+                headers=headers,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                print_success("Database Statistics - Status: 200")
+                
+                if 'database' in data:
+                    db_info = data['database']
+                    print_success(f"  Database name: {db_info.get('name')}")
+                    print_success(f"  Collections: {db_info.get('collections')}")
+                    print_success(f"  Data size: {db_info.get('dataSize')} bytes")
+                    print_success(f"  Indexes: {db_info.get('indexes')}")
+                
+                if 'collections' in data:
+                    collections = data['collections']
+                    print_success(f"  Collection details: {len(collections)} collections")
+                    for coll in collections[:3]:  # Show first 3
+                        print_info(f"    {coll.get('name')}: {coll.get('count')} documents")
+                
+                if 'timestamp' in data:
+                    print_success("  Timestamp included")
+                
+                check_security_headers(response, "Database Statistics")
+                results['/api/phase14/scalability/database/stats'] = True
+                
+            else:
+                print_error(f"Database Statistics - Status: {response.status_code}")
+                print_error(f"  Response: {response.text}")
+                results['/api/phase14/scalability/database/stats'] = False
+                
+        except Exception as e:
+            print_error(f"Database Statistics - Error: {str(e)}")
+            results['/api/phase14/scalability/database/stats'] = False
+    
+    else:
+        print_warning("Skipping admin endpoints - no authentication token available")
+        # Mark admin endpoints as failed due to no auth
+        admin_endpoints = [
+            '/api/phase14/scalability/cache/stats',
+            '/api/phase14/scalability/overview',
+            '/api/phase14/scalability/config',
+            '/api/phase14/scalability/connection-pool/health',
+            '/api/phase14/scalability/database/stats'
+        ]
+        for endpoint in admin_endpoints:
+            results[endpoint] = False
+    
+    return results
+
+
 def test_phase12_user_authentication():
     """Test Phase 12 User Authentication System"""
     print_header("PHASE 12 - USER AUTHENTICATION SYSTEM")
