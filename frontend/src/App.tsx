@@ -6,43 +6,51 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "./components/ThemeProvider";
 import CookieConsent from "./components/CookieConsent";
+import { lazy, Suspense } from "react";
+import LoadingSpinner from "./components/LoadingSpinner";
+
+// Eagerly load critical pages (Index page for initial load)
 import Index from "./pages/Index";
-import About from "./pages/About";
-import Services from "./pages/Services";
-import BookSession from "./pages/BookSession";
-import Events from "./pages/Events";
-import Blogs from "./pages/Blogs";
-import Careers from "./pages/Careers";
-import PsychologistPortal from "./pages/PsychologistPortal";
-import Volunteer from "./pages/Volunteer";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-import DataExport from "./pages/DataExport";
-import AccountDeletion from "./pages/AccountDeletion";
-import NotFound from "./pages/NotFound";
-// User imports
+
+// Lazy load all other pages for code splitting
+const About = lazy(() => import("./pages/About"));
+const Services = lazy(() => import("./pages/Services"));
+const BookSession = lazy(() => import("./pages/BookSession"));
+const Events = lazy(() => import("./pages/Events"));
+const Blogs = lazy(() => import("./pages/Blogs"));
+const Careers = lazy(() => import("./pages/Careers"));
+const PsychologistPortal = lazy(() => import("./pages/PsychologistPortal"));
+const Volunteer = lazy(() => import("./pages/Volunteer"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
+const DataExport = lazy(() => import("./pages/DataExport"));
+const AccountDeletion = lazy(() => import("./pages/AccountDeletion"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+// User imports - lazy loaded
 import { UserProvider } from "./contexts/UserContext";
-import UserLogin from "./pages/UserLogin";
-import UserSignup from "./pages/UserSignup";
-import UserDashboard from "./pages/UserDashboard";
-import UserProfile from "./pages/UserProfile";
-import PaymentSuccess from "./pages/PaymentSuccess";
-import PaymentFailure from "./pages/PaymentFailure";
-// Admin imports
+const UserLogin = lazy(() => import("./pages/UserLogin"));
+const UserSignup = lazy(() => import("./pages/UserSignup"));
+const UserDashboard = lazy(() => import("./pages/UserDashboard"));
+const UserProfile = lazy(() => import("./pages/UserProfile"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const PaymentFailure = lazy(() => import("./pages/PaymentFailure"));
+
+// Admin imports - lazy loaded for admin panel
 import { AdminProvider } from "./contexts/AdminContext";
-import AdminLayout from "./admin/AdminLayout";
-import AdminDashboard from "./admin/pages/AdminDashboard";
-import AdminSessions from "./admin/pages/AdminSessions";
-import AdminEvents from "./admin/pages/AdminEvents";
-import AdminBlogs from "./admin/pages/AdminBlogs";
-import AdminPsychologists from "./admin/pages/AdminPsychologists";
-import AdminVolunteers from "./admin/pages/AdminVolunteers";
-import AdminJobs from "./admin/pages/AdminJobs";
-import AdminContacts from "./admin/pages/AdminContacts";
-import AdminSettings from "./admin/pages/AdminSettings";
-import AdminLogs from "./admin/pages/AdminLogs";
-import AdminErrors from "./admin/pages/AdminErrors";
-import AdminLogin from "./admin/AdminLogin";
+const AdminLayout = lazy(() => import("./admin/AdminLayout"));
+const AdminDashboard = lazy(() => import("./admin/pages/AdminDashboard"));
+const AdminSessions = lazy(() => import("./admin/pages/AdminSessions"));
+const AdminEvents = lazy(() => import("./admin/pages/AdminEvents"));
+const AdminBlogs = lazy(() => import("./admin/pages/AdminBlogs"));
+const AdminPsychologists = lazy(() => import("./admin/pages/AdminPsychologists"));
+const AdminVolunteers = lazy(() => import("./admin/pages/AdminVolunteers"));
+const AdminJobs = lazy(() => import("./admin/pages/AdminJobs"));
+const AdminContacts = lazy(() => import("./admin/pages/AdminContacts"));
+const AdminSettings = lazy(() => import("./admin/pages/AdminSettings"));
+const AdminLogs = lazy(() => import("./admin/pages/AdminLogs"));
+const AdminErrors = lazy(() => import("./admin/pages/AdminErrors"));
+const AdminLogin = lazy(() => import("./admin/AdminLogin"));
 import AdminProtectedRoute from "./admin/AdminProtectedRoute";
 import ErrorBoundary from "./admin/components/ErrorBoundary";
 
