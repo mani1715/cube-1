@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Backend Testing Script for Phase 12 User Authentication and Phase 9 Endpoints
-Tests user signup, login, token refresh, profile retrieval, dashboard overview,
-production health checks, SEO endpoints, GDPR compliance, and security headers
+Backend Testing Script for Phase 14.1 Scalability & Infrastructure Endpoints
+Tests scalability health check, cache statistics, connection pool health,
+database statistics, scalability overview, configuration, and admin authentication.
+Also includes Phase 12 User Authentication, Phase 9 Production, SEO, and GDPR endpoints.
 """
 
 import requests
