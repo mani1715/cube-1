@@ -586,6 +586,20 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 app.add_middleware(SecurityHeadersMiddleware)
 
 
+# Phase 14.1 - Startup and Shutdown Events
+@app.on_event("startup")
+async def startup_cache_warming():
+    """Warm cache on application startup for better initial performance"""
+    try:
+        from api.phase14_scalability import CacheWarmer
+        logger.info("Phase 14.1: Initializing cache warming...")
+        await CacheWarmer.warm_critical_caches(db)
+        logger.info("✅ Phase 14.1: Cache warming completed")
+    except Exception as e:
+        logger.error(f"Cache warming on startup failed: {str(e)}")
+        # Don't block startup if cache warming fails
+
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
