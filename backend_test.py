@@ -12,7 +12,7 @@ from datetime import datetime
 import xml.etree.ElementTree as ET
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://cube-solver-25.preview.emergentagent.com"
+BACKEND_URL = "https://cubecraft-438.preview.emergentagent.com"
 
 class Colors:
     GREEN = '\033[92m'
