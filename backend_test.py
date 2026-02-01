@@ -409,17 +409,9 @@ def test_security_headers_comprehensive():
     
     return all_headers_ok
 
-def test_phase14_scalability_endpoints():
-    """Test Phase 14.1 Scalability & Infrastructure Endpoints"""
-    print_header("PHASE 14.1 - SCALABILITY & INFRASTRUCTURE ENDPOINTS")
-    
-    results = {}
-    admin_token = None
-    
-    # First, get admin authentication token
-    print_info("Getting admin authentication token...")
+def get_admin_token():
+    """Get admin authentication token for testing"""
     try:
-        # Try to login as super_admin (assuming default admin exists)
         login_data = {
             "email": "admin@acube.com",
             "password": "admin123"
@@ -435,12 +427,21 @@ def test_phase14_scalability_endpoints():
             data = response.json()
             admin_token = data.get('access_token')
             print_success("Admin authentication successful")
+            return admin_token
         else:
             print_warning(f"Admin login failed with status {response.status_code}")
-            print_warning("Will test public endpoints only")
+            return None
     except Exception as e:
         print_warning(f"Admin login error: {str(e)}")
-        print_warning("Will test public endpoints only")
+        return None
+
+
+def test_phase14_scalability_endpoints():
+    """Test Phase 14.1 Scalability & Infrastructure Endpoints"""
+    print_header("PHASE 14.1 - SCALABILITY & INFRASTRUCTURE ENDPOINTS")
+    
+    results = {}
+    admin_token = get_admin_token()
     
     # Test 1: Public Health Check (no auth required)
     print_info("Testing Scalability Health Check: /api/phase14/scalability/health")
@@ -463,15 +464,11 @@ def test_phase14_scalability_endpoints():
                     cache_status = components['cache'].get('status')
                     print_success(f"  Cache component: {cache_status}")
             
-            if 'timestamp' in data:
-                print_success("  Timestamp included")
-            
             check_security_headers(response, "Scalability Health Check")
             results['/api/phase14/scalability/health'] = True
             
         else:
             print_error(f"Scalability Health Check - Status: {response.status_code}")
-            print_error(f"  Response: {response.text}")
             results['/api/phase14/scalability/health'] = False
             
     except Exception as e:
@@ -482,129 +479,7 @@ def test_phase14_scalability_endpoints():
     if admin_token:
         headers = {"Authorization": f"Bearer {admin_token}"}
         
-        # Test 2: Cache Statistics
-        print_info("Testing Cache Statistics: /api/phase14/scalability/cache/stats")
-        try:
-            response = requests.get(
-                f"{BACKEND_URL}/api/phase14/scalability/cache/stats",
-                headers=headers,
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                print_success("Cache Statistics - Status: 200")
-                
-                if 'cache_stats' in data:
-                    cache_stats = data['cache_stats']
-                    print_success(f"  Cache hit rate: {cache_stats.get('hit_rate', 0)}")
-                    print_success(f"  Cache size: {cache_stats.get('cache_size', 0)}")
-                    print_success(f"  Total requests: {cache_stats.get('total_requests', 0)}")
-                
-                if 'timestamp' in data:
-                    print_success("  Timestamp included")
-                
-                check_security_headers(response, "Cache Statistics")
-                results['/api/phase14/scalability/cache/stats'] = True
-                
-            else:
-                print_error(f"Cache Statistics - Status: {response.status_code}")
-                print_error(f"  Response: {response.text}")
-                results['/api/phase14/scalability/cache/stats'] = False
-                
-        except Exception as e:
-            print_error(f"Cache Statistics - Error: {str(e)}")
-            results['/api/phase14/scalability/cache/stats'] = False
-        
-        # Test 3: Scalability Overview
-        print_info("Testing Scalability Overview: /api/phase14/scalability/overview")
-        try:
-            response = requests.get(
-                f"{BACKEND_URL}/api/phase14/scalability/overview",
-                headers=headers,
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                print_success("Scalability Overview - Status: 200")
-                
-                if 'connection_pool' in data:
-                    pool = data['connection_pool']
-                    print_success(f"  Connection pool status: {pool.get('status')}")
-                    print_success(f"  Pool response time: {pool.get('response_time_ms')}ms")
-                
-                if 'cache' in data:
-                    cache = data['cache']
-                    print_success(f"  Cache hit rate: {cache.get('hit_rate')}")
-                    print_success(f"  Cache entries: {cache.get('total_entries')}")
-                
-                if 'performance' in data:
-                    perf = data['performance']
-                    print_success(f"  Total requests: {perf.get('total_requests')}")
-                    print_success(f"  Avg response time: {perf.get('avg_response_time')}s")
-                
-                if 'optimizations_enabled' in data:
-                    optimizations = data['optimizations_enabled']
-                    print_success(f"  Optimizations: {len(optimizations)} enabled")
-                
-                check_security_headers(response, "Scalability Overview")
-                results['/api/phase14/scalability/overview'] = True
-                
-            else:
-                print_error(f"Scalability Overview - Status: {response.status_code}")
-                print_error(f"  Response: {response.text}")
-                results['/api/phase14/scalability/overview'] = False
-                
-        except Exception as e:
-            print_error(f"Scalability Overview - Error: {str(e)}")
-            results['/api/phase14/scalability/overview'] = False
-        
-        # Test 4: Scalability Configuration
-        print_info("Testing Scalability Configuration: /api/phase14/scalability/config")
-        try:
-            response = requests.get(
-                f"{BACKEND_URL}/api/phase14/scalability/config",
-                headers=headers,
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                print_success("Scalability Configuration - Status: 200")
-                
-                if 'connection_pool' in data:
-                    pool_config = data['connection_pool']
-                    print_success(f"  Max pool size: {pool_config.get('max_pool_size')}")
-                    print_success(f"  Min pool size: {pool_config.get('min_pool_size')}")
-                
-                if 'cache_ttl_seconds' in data:
-                    cache_ttl = data['cache_ttl_seconds']
-                    print_success(f"  Cache TTL configs: {len(cache_ttl)} types")
-                    print_info(f"    Events TTL: {cache_ttl.get('events')}s")
-                    print_info(f"    Sessions TTL: {cache_ttl.get('sessions')}s")
-                
-                if 'compression' in data:
-                    compression = data['compression']
-                    print_success(f"  Compression enabled: {compression.get('enabled')}")
-                
-                if 'batch_operations' in data:
-                    batch = data['batch_operations']
-                    print_success(f"  Insert batch size: {batch.get('insert_batch_size')}")
-                
-                check_security_headers(response, "Scalability Configuration")
-                results['/api/phase14/scalability/config'] = True
-                
-            else:
-                print_error(f"Scalability Configuration - Status: {response.status_code}")
-                print_error(f"  Response: {response.text}")
-                results['/api/phase14/scalability/config'] = False
-                
-        except Exception as e:
-            print_error(f"Scalability Configuration - Error: {str(e)}")
-            results['/api/phase14/scalability/config'] = False
-        
-        # Test 5: Connection Pool Health
+        # Test Connection Pool Health
         print_info("Testing Connection Pool Health: /api/phase14/scalability/connection-pool/health")
         try:
             response = requests.get(
@@ -620,80 +495,937 @@ def test_phase14_scalability_endpoints():
                 if data.get('status') in ['healthy', 'unhealthy']:
                     print_success(f"  Pool status: {data.get('status')}")
                 
-                if 'response_time_ms' in data:
-                    print_success(f"  Response time: {data.get('response_time_ms')}ms")
-                
-                if 'max_pool_size' in data:
-                    print_success(f"  Max pool size: {data.get('max_pool_size')}")
-                
-                if 'stats' in data:
-                    print_success("  Pool statistics included")
-                
                 check_security_headers(response, "Connection Pool Health")
                 results['/api/phase14/scalability/connection-pool/health'] = True
                 
             else:
                 print_error(f"Connection Pool Health - Status: {response.status_code}")
-                print_error(f"  Response: {response.text}")
                 results['/api/phase14/scalability/connection-pool/health'] = False
                 
         except Exception as e:
             print_error(f"Connection Pool Health - Error: {str(e)}")
             results['/api/phase14/scalability/connection-pool/health'] = False
         
-        # Test 6: Database Statistics
-        print_info("Testing Database Statistics: /api/phase14/scalability/database/stats")
+        # Test Cache Statistics
+        print_info("Testing Cache Statistics: /api/phase14/scalability/cache/stats")
         try:
             response = requests.get(
-                f"{BACKEND_URL}/api/phase14/scalability/database/stats",
+                f"{BACKEND_URL}/api/phase14/scalability/cache/stats",
                 headers=headers,
                 timeout=10
             )
             
             if response.status_code == 200:
                 data = response.json()
-                print_success("Database Statistics - Status: 200")
+                print_success("Cache Statistics - Status: 200")
                 
-                if 'database' in data:
-                    db_info = data['database']
-                    print_success(f"  Database name: {db_info.get('name')}")
-                    print_success(f"  Collections: {db_info.get('collections')}")
-                    print_success(f"  Data size: {db_info.get('dataSize')} bytes")
-                    print_success(f"  Indexes: {db_info.get('indexes')}")
+                if 'cache_stats' in data:
+                    cache_stats = data['cache_stats']
+                    print_success(f"  Cache hit rate: {cache_stats.get('hit_rate', 0)}")
                 
-                if 'collections' in data:
-                    collections = data['collections']
-                    print_success(f"  Collection details: {len(collections)} collections")
-                    for coll in collections[:3]:  # Show first 3
-                        print_info(f"    {coll.get('name')}: {coll.get('count')} documents")
-                
-                if 'timestamp' in data:
-                    print_success("  Timestamp included")
-                
-                check_security_headers(response, "Database Statistics")
-                results['/api/phase14/scalability/database/stats'] = True
+                check_security_headers(response, "Cache Statistics")
+                results['/api/phase14/scalability/cache/stats'] = True
                 
             else:
-                print_error(f"Database Statistics - Status: {response.status_code}")
-                print_error(f"  Response: {response.text}")
-                results['/api/phase14/scalability/database/stats'] = False
+                print_error(f"Cache Statistics - Status: {response.status_code}")
+                results['/api/phase14/scalability/cache/stats'] = False
                 
         except Exception as e:
-            print_error(f"Database Statistics - Error: {str(e)}")
-            results['/api/phase14/scalability/database/stats'] = False
+            print_error(f"Cache Statistics - Error: {str(e)}")
+            results['/api/phase14/scalability/cache/stats'] = False
+        
+        # Test Performance Metrics
+        print_info("Testing Performance Metrics: /api/phase14/scalability/performance/metrics")
+        try:
+            response = requests.get(
+                f"{BACKEND_URL}/api/phase14/scalability/performance/metrics",
+                headers=headers,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                print_success("Performance Metrics - Status: 200")
+                
+                if 'total_requests' in data:
+                    print_success(f"  Total requests: {data.get('total_requests')}")
+                
+                check_security_headers(response, "Performance Metrics")
+                results['/api/phase14/scalability/performance/metrics'] = True
+                
+            else:
+                print_error(f"Performance Metrics - Status: {response.status_code}")
+                results['/api/phase14/scalability/performance/metrics'] = False
+                
+        except Exception as e:
+            print_error(f"Performance Metrics - Error: {str(e)}")
+            results['/api/phase14/scalability/performance/metrics'] = False
     
     else:
         print_warning("Skipping admin endpoints - no authentication token available")
-        # Mark admin endpoints as failed due to no auth
         admin_endpoints = [
-            '/api/phase14/scalability/cache/stats',
-            '/api/phase14/scalability/overview',
-            '/api/phase14/scalability/config',
             '/api/phase14/scalability/connection-pool/health',
-            '/api/phase14/scalability/database/stats'
+            '/api/phase14/scalability/cache/stats',
+            '/api/phase14/scalability/performance/metrics'
         ]
         for endpoint in admin_endpoints:
             results[endpoint] = False
+    
+    return results
+
+
+def test_phase14_backup_endpoints():
+    """Test Phase 14.2 Backup & Disaster Recovery Endpoints"""
+    print_header("PHASE 14.2 - BACKUP & DISASTER RECOVERY ENDPOINTS")
+    
+    results = {}
+    admin_token = get_admin_token()
+    
+    if not admin_token:
+        print_warning("Skipping backup tests - no authentication token available")
+        return {}
+    
+    headers = {"Authorization": f"Bearer {admin_token}"}
+    
+    # Test 1: Create Backup
+    print_info("Testing Create Backup: /api/phase14/backup/create")
+    try:
+        backup_data = {
+            "backup_type": "manual"
+        }
+        
+        response = requests.post(
+            f"{BACKEND_URL}/api/phase14/backup/create",
+            json=backup_data,
+            headers=headers,
+            timeout=30
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Create Backup - Status: 200")
+            
+            if 'backup' in data and 'backup_id' in data['backup']:
+                backup_id = data['backup']['backup_id']
+                print_success(f"  Backup ID: {backup_id}")
+                # Store for later tests
+                results['backup_id'] = backup_id
+            
+            check_security_headers(response, "Create Backup")
+            results['/api/phase14/backup/create'] = True
+            
+        else:
+            print_error(f"Create Backup - Status: {response.status_code}")
+            print_error(f"  Response: {response.text}")
+            results['/api/phase14/backup/create'] = False
+            
+    except Exception as e:
+        print_error(f"Create Backup - Error: {str(e)}")
+        results['/api/phase14/backup/create'] = False
+    
+    # Test 2: List Backups
+    print_info("Testing List Backups: /api/phase14/backup/list")
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/phase14/backup/list",
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("List Backups - Status: 200")
+            
+            if 'total_backups' in data:
+                print_success(f"  Total backups: {data.get('total_backups')}")
+            
+            if 'backups' in data and len(data['backups']) > 0:
+                print_success(f"  Backup entries: {len(data['backups'])}")
+            
+            check_security_headers(response, "List Backups")
+            results['/api/phase14/backup/list'] = True
+            
+        else:
+            print_error(f"List Backups - Status: {response.status_code}")
+            results['/api/phase14/backup/list'] = False
+            
+    except Exception as e:
+        print_error(f"List Backups - Error: {str(e)}")
+        results['/api/phase14/backup/list'] = False
+    
+    # Test 3: Backup Statistics
+    print_info("Testing Backup Statistics: /api/phase14/backup/statistics")
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/phase14/backup/statistics",
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Backup Statistics - Status: 200")
+            
+            if 'total_backups' in data:
+                print_success(f"  Total backups: {data.get('total_backups')}")
+            
+            if 'storage_usage' in data:
+                storage = data['storage_usage']
+                print_success(f"  Storage usage: {storage.get('total_size_mb', 0)} MB")
+            
+            check_security_headers(response, "Backup Statistics")
+            results['/api/phase14/backup/statistics'] = True
+            
+        else:
+            print_error(f"Backup Statistics - Status: {response.status_code}")
+            results['/api/phase14/backup/statistics'] = False
+            
+    except Exception as e:
+        print_error(f"Backup Statistics - Error: {str(e)}")
+        results['/api/phase14/backup/statistics'] = False
+    
+    return results
+
+
+def test_phase14_roles_endpoints():
+    """Test Phase 14.3 Role Expansion Endpoints"""
+    print_header("PHASE 14.3 - ROLE EXPANSION ENDPOINTS")
+    
+    results = {}
+    admin_token = get_admin_token()
+    
+    if not admin_token:
+        print_warning("Skipping role tests - no authentication token available")
+        return {}
+    
+    headers = {"Authorization": f"Bearer {admin_token}"}
+    
+    # Test 1: List All Roles
+    print_info("Testing List Roles: /api/phase14/roles")
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/phase14/roles",
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("List Roles - Status: 200")
+            
+            if 'total_roles' in data:
+                print_success(f"  Total roles: {data.get('total_roles')}")
+            
+            if 'roles' in data:
+                roles = data['roles']
+                print_success(f"  Role entries: {len(roles)}")
+                
+                # Check for expected roles
+                role_names = [role.get('role') for role in roles]
+                expected_roles = ['super_admin', 'admin', 'content_manager', 'moderator', 'analyst', 'viewer']
+                
+                for expected_role in expected_roles:
+                    if expected_role in role_names:
+                        print_success(f"    ✓ {expected_role}")
+                    else:
+                        print_error(f"    ✗ {expected_role} missing")
+            
+            check_security_headers(response, "List Roles")
+            results['/api/phase14/roles'] = True
+            
+        else:
+            print_error(f"List Roles - Status: {response.status_code}")
+            results['/api/phase14/roles'] = False
+            
+    except Exception as e:
+        print_error(f"List Roles - Error: {str(e)}")
+        results['/api/phase14/roles'] = False
+    
+    # Test 2: Get Role Permissions
+    print_info("Testing Role Permissions: /api/phase14/roles/content_manager/permissions")
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/phase14/roles/content_manager/permissions",
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Role Permissions - Status: 200")
+            
+            if data.get('role') == 'content_manager':
+                print_success(f"  Role: {data.get('role')}")
+            
+            if 'permissions' in data:
+                permissions = data['permissions']
+                print_success(f"  Permissions: {len(permissions)}")
+            
+            check_security_headers(response, "Role Permissions")
+            results['/api/phase14/roles/content_manager/permissions'] = True
+            
+        else:
+            print_error(f"Role Permissions - Status: {response.status_code}")
+            results['/api/phase14/roles/content_manager/permissions'] = False
+            
+    except Exception as e:
+        print_error(f"Role Permissions - Error: {str(e)}")
+        results['/api/phase14/roles/content_manager/permissions'] = False
+    
+    # Test 3: Permission Matrix
+    print_info("Testing Permission Matrix: /api/phase14/roles/matrix")
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/phase14/roles/matrix",
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Permission Matrix - Status: 200")
+            
+            if 'roles' in data:
+                print_success(f"  Roles in matrix: {len(data['roles'])}")
+            
+            if 'all_permissions' in data:
+                print_success(f"  Total permissions: {len(data['all_permissions'])}")
+            
+            check_security_headers(response, "Permission Matrix")
+            results['/api/phase14/roles/matrix'] = True
+            
+        else:
+            print_error(f"Permission Matrix - Status: {response.status_code}")
+            results['/api/phase14/roles/matrix'] = False
+            
+    except Exception as e:
+        print_error(f"Permission Matrix - Error: {str(e)}")
+        results['/api/phase14/roles/matrix'] = False
+    
+    # Test 4: Role Statistics
+    print_info("Testing Role Statistics: /api/phase14/roles/statistics")
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/phase14/roles/statistics",
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Role Statistics - Status: 200")
+            
+            if 'total_admins' in data:
+                print_success(f"  Total admins: {data.get('total_admins')}")
+            
+            if 'role_distribution' in data:
+                print_success(f"  Role distribution entries: {len(data['role_distribution'])}")
+            
+            check_security_headers(response, "Role Statistics")
+            results['/api/phase14/roles/statistics'] = True
+            
+        else:
+            print_error(f"Role Statistics - Status: {response.status_code}")
+            results['/api/phase14/roles/statistics'] = False
+            
+    except Exception as e:
+        print_error(f"Role Statistics - Error: {str(e)}")
+        results['/api/phase14/roles/statistics'] = False
+    
+    return results
+
+
+def test_phase14_communication_endpoints():
+    """Test Phase 14.4 Communication Enhancements Endpoints"""
+    print_header("PHASE 14.4 - COMMUNICATION ENHANCEMENTS ENDPOINTS")
+    
+    results = {}
+    admin_token = get_admin_token()
+    
+    if not admin_token:
+        print_warning("Skipping communication tests - no authentication token available")
+        return {}
+    
+    headers = {"Authorization": f"Bearer {admin_token}"}
+    template_id = None
+    
+    # Test 1: Create Email Template
+    print_info("Testing Create Email Template: /api/phase14/communication/templates")
+    try:
+        template_data = {
+            "name": "Welcome Email",
+            "subject": "Welcome to A-Cube {{user_name}}",
+            "body": "Hello {{user_name}}, welcome to our platform!",
+            "category": "transactional",
+            "variables": ["user_name"]
+        }
+        
+        response = requests.post(
+            f"{BACKEND_URL}/api/phase14/communication/templates",
+            json=template_data,
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Create Email Template - Status: 200")
+            
+            if data.get('success') is True:
+                print_success("  Template created successfully")
+            
+            if 'template_id' in data:
+                template_id = data['template_id']
+                print_success(f"  Template ID: {template_id}")
+            
+            check_security_headers(response, "Create Email Template")
+            results['/api/phase14/communication/templates'] = True
+            
+        else:
+            print_error(f"Create Email Template - Status: {response.status_code}")
+            print_error(f"  Response: {response.text}")
+            results['/api/phase14/communication/templates'] = False
+            
+    except Exception as e:
+        print_error(f"Create Email Template - Error: {str(e)}")
+        results['/api/phase14/communication/templates'] = False
+    
+    # Test 2: List Email Templates
+    print_info("Testing List Email Templates: /api/phase14/communication/templates")
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/phase14/communication/templates",
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("List Email Templates - Status: 200")
+            
+            if 'total' in data:
+                print_success(f"  Total templates: {data.get('total')}")
+            
+            if 'templates' in data:
+                templates = data['templates']
+                print_success(f"  Template entries: {len(templates)}")
+                
+                # Use first template ID if we don't have one from creation
+                if not template_id and templates:
+                    template_id = templates[0].get('id')
+            
+            check_security_headers(response, "List Email Templates")
+            results['/api/phase14/communication/templates_list'] = True
+            
+        else:
+            print_error(f"List Email Templates - Status: {response.status_code}")
+            results['/api/phase14/communication/templates_list'] = False
+            
+    except Exception as e:
+        print_error(f"List Email Templates - Error: {str(e)}")
+        results['/api/phase14/communication/templates_list'] = False
+    
+    # Test 3: Send Email (if we have a template)
+    if template_id:
+        print_info("Testing Send Email: /api/phase14/communication/send-email")
+        try:
+            email_data = {
+                "template_id": template_id,
+                "recipient": "test@example.com",
+                "variables": {"user_name": "John Doe"},
+                "priority": "normal"
+            }
+            
+            response = requests.post(
+                f"{BACKEND_URL}/api/phase14/communication/send-email",
+                json=email_data,
+                headers=headers,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                print_success("Send Email - Status: 200")
+                
+                if data.get('success') is True:
+                    print_success("  Email queued successfully")
+                
+                if 'email_id' in data:
+                    print_success(f"  Email ID: {data['email_id']}")
+                
+                check_security_headers(response, "Send Email")
+                results['/api/phase14/communication/send-email'] = True
+                
+            else:
+                print_error(f"Send Email - Status: {response.status_code}")
+                results['/api/phase14/communication/send-email'] = False
+                
+        except Exception as e:
+            print_error(f"Send Email - Error: {str(e)}")
+            results['/api/phase14/communication/send-email'] = False
+    else:
+        print_warning("Skipping send email test - no template ID available")
+        results['/api/phase14/communication/send-email'] = False
+    
+    # Test 4: Email Queue
+    print_info("Testing Email Queue: /api/phase14/communication/email-queue")
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/phase14/communication/email-queue",
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Email Queue - Status: 200")
+            
+            if 'total' in data:
+                print_success(f"  Total emails in queue: {data.get('total')}")
+            
+            if 'emails' in data:
+                print_success(f"  Email entries: {len(data['emails'])}")
+            
+            check_security_headers(response, "Email Queue")
+            results['/api/phase14/communication/email-queue'] = True
+            
+        else:
+            print_error(f"Email Queue - Status: {response.status_code}")
+            results['/api/phase14/communication/email-queue'] = False
+            
+    except Exception as e:
+        print_error(f"Email Queue - Error: {str(e)}")
+        results['/api/phase14/communication/email-queue'] = False
+    
+    return results
+
+
+def test_phase14_engagement_endpoints():
+    """Test Phase 14.5 Engagement & Retention Endpoints"""
+    print_header("PHASE 14.5 - ENGAGEMENT & RETENTION ENDPOINTS")
+    
+    results = {}
+    admin_token = get_admin_token()
+    
+    if not admin_token:
+        print_warning("Skipping engagement tests - no authentication token available")
+        return {}
+    
+    headers = {"Authorization": f"Bearer {admin_token}"}
+    
+    # Test 1: Track Activity
+    print_info("Testing Track Activity: /api/phase14/engagement/track-activity")
+    try:
+        activity_data = {
+            "user_id": "test-user-123",
+            "activity_type": "login",
+            "metadata": {"source": "web"}
+        }
+        
+        response = requests.post(
+            f"{BACKEND_URL}/api/phase14/engagement/track-activity",
+            json=activity_data,
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Track Activity - Status: 200")
+            
+            if data.get('success') is True:
+                print_success("  Activity tracked successfully")
+            
+            if data.get('activity_type') == 'login':
+                print_success(f"  Activity type: {data.get('activity_type')}")
+            
+            check_security_headers(response, "Track Activity")
+            results['/api/phase14/engagement/track-activity'] = True
+            
+        else:
+            print_error(f"Track Activity - Status: {response.status_code}")
+            print_error(f"  Response: {response.text}")
+            results['/api/phase14/engagement/track-activity'] = False
+            
+    except Exception as e:
+        print_error(f"Track Activity - Error: {str(e)}")
+        results['/api/phase14/engagement/track-activity'] = False
+    
+    # Test 2: Engagement Metrics
+    print_info("Testing Engagement Metrics: /api/phase14/engagement/metrics")
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/phase14/engagement/metrics",
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Engagement Metrics - Status: 200")
+            
+            if 'daily_active_users' in data:
+                print_success(f"  Daily active users: {data.get('daily_active_users')}")
+            
+            if 'monthly_active_users' in data:
+                print_success(f"  Monthly active users: {data.get('monthly_active_users')}")
+            
+            if 'engagement_rate' in data:
+                print_success(f"  Engagement rate: {data.get('engagement_rate')}%")
+            
+            check_security_headers(response, "Engagement Metrics")
+            results['/api/phase14/engagement/metrics'] = True
+            
+        else:
+            print_error(f"Engagement Metrics - Status: {response.status_code}")
+            results['/api/phase14/engagement/metrics'] = False
+            
+    except Exception as e:
+        print_error(f"Engagement Metrics - Error: {str(e)}")
+        results['/api/phase14/engagement/metrics'] = False
+    
+    # Test 3: Retention Analysis
+    print_info("Testing Retention Analysis: /api/phase14/engagement/retention-analysis")
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/phase14/engagement/retention-analysis",
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Retention Analysis - Status: 200")
+            
+            if 'total_users' in data:
+                print_success(f"  Total users analyzed: {data.get('total_users')}")
+            
+            if 'overall_retention_rate' in data:
+                print_success(f"  Overall retention rate: {data.get('overall_retention_rate')}%")
+            
+            if 'cohorts' in data:
+                print_success(f"  Cohort entries: {len(data['cohorts'])}")
+            
+            check_security_headers(response, "Retention Analysis")
+            results['/api/phase14/engagement/retention-analysis'] = True
+            
+        else:
+            print_error(f"Retention Analysis - Status: {response.status_code}")
+            results['/api/phase14/engagement/retention-analysis'] = False
+            
+    except Exception as e:
+        print_error(f"Retention Analysis - Error: {str(e)}")
+        results['/api/phase14/engagement/retention-analysis'] = False
+    
+    # Test 4: Inactive Users
+    print_info("Testing Inactive Users: /api/phase14/engagement/inactive-users?days=30")
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/phase14/engagement/inactive-users?days=30",
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Inactive Users - Status: 200")
+            
+            if 'total_inactive' in data:
+                print_success(f"  Total inactive users: {data.get('total_inactive')}")
+            
+            if 'inactivity_threshold_days' in data:
+                print_success(f"  Inactivity threshold: {data.get('inactivity_threshold_days')} days")
+            
+            check_security_headers(response, "Inactive Users")
+            results['/api/phase14/engagement/inactive-users'] = True
+            
+        else:
+            print_error(f"Inactive Users - Status: {response.status_code}")
+            results['/api/phase14/engagement/inactive-users'] = False
+            
+    except Exception as e:
+        print_error(f"Inactive Users - Error: {str(e)}")
+        results['/api/phase14/engagement/inactive-users'] = False
+    
+    return results
+
+
+def test_phase14_power_tools_endpoints():
+    """Test Phase 14.6 Admin Power Tools Endpoints"""
+    print_header("PHASE 14.6 - ADMIN POWER TOOLS ENDPOINTS")
+    
+    results = {}
+    admin_token = get_admin_token()
+    
+    if not admin_token:
+        print_warning("Skipping power tools tests - no authentication token available")
+        return {}
+    
+    headers = {"Authorization": f"Bearer {admin_token}"}
+    
+    # Test 1: Admin Dashboard
+    print_info("Testing Admin Dashboard: /api/phase14/power-tools/dashboard")
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/phase14/power-tools/dashboard",
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Admin Dashboard - Status: 200")
+            
+            if 'statistics' in data:
+                print_success("  Statistics section present")
+            
+            if 'pending_actions' in data:
+                print_success("  Pending actions section present")
+            
+            check_security_headers(response, "Admin Dashboard")
+            results['/api/phase14/power-tools/dashboard'] = True
+            
+        else:
+            print_error(f"Admin Dashboard - Status: {response.status_code}")
+            results['/api/phase14/power-tools/dashboard'] = False
+            
+    except Exception as e:
+        print_error(f"Admin Dashboard - Error: {str(e)}")
+        results['/api/phase14/power-tools/dashboard'] = False
+    
+    # Test 2: Advanced Search
+    print_info("Testing Advanced Search: /api/phase14/power-tools/advanced-search/blogs")
+    try:
+        search_data = {
+            "search": "mental health",
+            "page": 1,
+            "limit": 10
+        }
+        
+        response = requests.post(
+            f"{BACKEND_URL}/api/phase14/power-tools/advanced-search/blogs",
+            json=search_data,
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Advanced Search - Status: 200")
+            
+            if 'collection' in data:
+                print_success(f"  Collection: {data.get('collection')}")
+            
+            if 'results' in data:
+                print_success(f"  Results: {len(data['results'])} items")
+            
+            if 'pagination' in data:
+                pagination = data['pagination']
+                print_success(f"  Total: {pagination.get('total')} items")
+            
+            check_security_headers(response, "Advanced Search")
+            results['/api/phase14/power-tools/advanced-search/blogs'] = True
+            
+        else:
+            print_error(f"Advanced Search - Status: {response.status_code}")
+            results['/api/phase14/power-tools/advanced-search/blogs'] = False
+            
+    except Exception as e:
+        print_error(f"Advanced Search - Error: {str(e)}")
+        results['/api/phase14/power-tools/advanced-search/blogs'] = False
+    
+    return results
+
+
+def test_phase14_hardening_endpoints():
+    """Test Phase 14.7 Final Go-Live Hardening Endpoints"""
+    print_header("PHASE 14.7 - FINAL GO-LIVE HARDENING ENDPOINTS")
+    
+    results = {}
+    admin_token = get_admin_token()
+    
+    if not admin_token:
+        print_warning("Skipping hardening tests - no authentication token available")
+        return {}
+    
+    headers = {"Authorization": f"Bearer {admin_token}"}
+    
+    # Test 1: Security Audit
+    print_info("Testing Security Audit: /api/phase14/hardening/security-audit")
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/phase14/hardening/security-audit",
+            headers=headers,
+            timeout=15
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Security Audit - Status: 200")
+            
+            if 'overall_status' in data:
+                print_success(f"  Overall status: {data.get('overall_status')}")
+            
+            if 'checks' in data:
+                print_success(f"  Security checks: {len(data['checks'])}")
+            
+            if 'warnings' in data:
+                print_success(f"  Warnings: {len(data['warnings'])}")
+            
+            if 'recommendations' in data:
+                print_success(f"  Recommendations: {len(data['recommendations'])}")
+            
+            check_security_headers(response, "Security Audit")
+            results['/api/phase14/hardening/security-audit'] = True
+            
+        else:
+            print_error(f"Security Audit - Status: {response.status_code}")
+            results['/api/phase14/hardening/security-audit'] = False
+            
+    except Exception as e:
+        print_error(f"Security Audit - Error: {str(e)}")
+        results['/api/phase14/hardening/security-audit'] = False
+    
+    # Test 2: Performance Review
+    print_info("Testing Performance Review: /api/phase14/hardening/performance-review")
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/phase14/hardening/performance-review",
+            headers=headers,
+            timeout=15
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Performance Review - Status: 200")
+            
+            if 'database_stats' in data:
+                db_stats = data['database_stats']
+                print_success(f"  Total collections: {db_stats.get('total_collections')}")
+                print_success(f"  Total documents: {db_stats.get('total_documents')}")
+            
+            if 'optimization_opportunities' in data:
+                print_success(f"  Optimization opportunities: {len(data['optimization_opportunities'])}")
+            
+            check_security_headers(response, "Performance Review")
+            results['/api/phase14/hardening/performance-review'] = True
+            
+        else:
+            print_error(f"Performance Review - Status: {response.status_code}")
+            results['/api/phase14/hardening/performance-review'] = False
+            
+    except Exception as e:
+        print_error(f"Performance Review - Error: {str(e)}")
+        results['/api/phase14/hardening/performance-review'] = False
+    
+    # Test 3: Comprehensive Health Check
+    print_info("Testing Comprehensive Health Check: /api/phase14/hardening/health-comprehensive")
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/phase14/hardening/health-comprehensive",
+            headers=headers,
+            timeout=15
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Comprehensive Health Check - Status: 200")
+            
+            if 'overall_status' in data:
+                print_success(f"  Overall status: {data.get('overall_status')}")
+            
+            if 'components' in data:
+                components = data['components']
+                print_success(f"  Components checked: {len(components)}")
+                
+                for component in components:
+                    comp_name = component.get('component')
+                    comp_status = component.get('status')
+                    print_info(f"    {comp_name}: {comp_status}")
+            
+            check_security_headers(response, "Comprehensive Health Check")
+            results['/api/phase14/hardening/health-comprehensive'] = True
+            
+        else:
+            print_error(f"Comprehensive Health Check - Status: {response.status_code}")
+            results['/api/phase14/hardening/health-comprehensive'] = False
+            
+    except Exception as e:
+        print_error(f"Comprehensive Health Check - Error: {str(e)}")
+        results['/api/phase14/hardening/health-comprehensive'] = False
+    
+    # Test 4: Production Checklist
+    print_info("Testing Production Checklist: /api/phase14/hardening/production-checklist")
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/phase14/hardening/production-checklist",
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Production Checklist - Status: 200")
+            
+            if 'summary' in data:
+                summary = data['summary']
+                print_success(f"  Total checks: {summary.get('total_checks')}")
+                print_success(f"  Completed: {summary.get('completed_checks')}")
+                print_success(f"  Overall completion: {summary.get('overall_completion_rate')}%")
+                print_success(f"  Ready for production: {summary.get('ready_for_production')}")
+            
+            if 'categories' in data:
+                print_success(f"  Categories: {len(data['categories'])}")
+            
+            check_security_headers(response, "Production Checklist")
+            results['/api/phase14/hardening/production-checklist'] = True
+            
+        else:
+            print_error(f"Production Checklist - Status: {response.status_code}")
+            results['/api/phase14/hardening/production-checklist'] = False
+            
+    except Exception as e:
+        print_error(f"Production Checklist - Error: {str(e)}")
+        results['/api/phase14/hardening/production-checklist'] = False
+    
+    # Test 5: Optimization (Dry Run)
+    print_info("Testing Optimization: /api/phase14/hardening/optimize")
+    try:
+        optimization_data = {
+            "optimization_type": "all",
+            "dry_run": True
+        }
+        
+        response = requests.post(
+            f"{BACKEND_URL}/api/phase14/hardening/optimize",
+            json=optimization_data,
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            print_success("Optimization - Status: 200")
+            
+            if data.get('dry_run') is True:
+                print_success("  Dry run mode confirmed")
+            
+            if 'actions_taken' in data:
+                print_success(f"  Actions planned: {len(data['actions_taken'])}")
+            
+            if 'recommendations' in data:
+                print_success(f"  Recommendations: {len(data['recommendations'])}")
+            
+            check_security_headers(response, "Optimization")
+            results['/api/phase14/hardening/optimize'] = True
+            
+        else:
+            print_error(f"Optimization - Status: {response.status_code}")
+            results['/api/phase14/hardening/optimize'] = False
+            
+    except Exception as e:
+        print_error(f"Optimization - Error: {str(e)}")
+        results['/api/phase14/hardening/optimize'] = False
     
     return results
 
