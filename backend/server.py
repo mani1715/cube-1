@@ -532,6 +532,10 @@ app.include_router(phase12_email_router)  # Phase 12.2 routes
 app.include_router(phase12_users_router)  # Phase 12.3 routes
 app.include_router(phase12_dashboard_router)  # Phase 12.4 routes
 app.include_router(phase14_router)  # Phase 14.1 routes
+app.include_router(phase14_engagement_router)  # Phase 14.5 routes
+app.include_router(phase14_communication_router)  # Phase 14.4 routes
+app.include_router(phase14_roles_router)  # Phase 14.3 routes
+app.include_router(phase14_hardening_router)  # Phase 14.7 routes
 
 # Mount static files for uploads
 from fastapi.staticfiles import StaticFiles
