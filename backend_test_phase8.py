@@ -12,7 +12,7 @@ from typing import Dict, Any, List
 import bcrypt
 
 # Backend URL from frontend/.env
-BASE_URL = "https://speedcube-app-3.preview.emergentagent.com/api"
+BASE_URL = "https://cube-project.preview.emergentagent.com/api"
 
 class Phase8Tester:
     def __init__(self):
