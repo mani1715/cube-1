@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """
-Backend Testing Script for Phase 14.1 Scalability & Infrastructure Endpoints
-Tests scalability health check, cache statistics, connection pool health,
-database statistics, scalability overview, configuration, and admin authentication.
-Also includes Phase 12 User Authentication, Phase 9 Production, SEO, and GDPR endpoints.
+Comprehensive Backend Testing Script for Phase 14 - All Sub-Phases
+Tests all Phase 14 features: Scalability, Backup, Roles, Communication, Engagement, Power Tools, and Hardening
+Also includes Phase 9 Production, SEO, GDPR endpoints, and Phase 12 User Authentication.
 """
 
 import requests
@@ -11,6 +10,7 @@ import json
 import sys
 from datetime import datetime
 import xml.etree.ElementTree as ET
+import uuid
 
 # Backend URL from frontend .env
 BACKEND_URL = "https://cube-genius-5.preview.emergentagent.com"
