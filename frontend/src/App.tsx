@@ -28,6 +28,7 @@ const Terms = lazy(() => import("./pages/Terms"));
 const DataExport = lazy(() => import("./pages/DataExport"));
 const AccountDeletion = lazy(() => import("./pages/AccountDeletion"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Offline = lazy(() => import("./pages/Offline"));
 
 // User imports - lazy loaded
 import { UserProvider } from "./contexts/UserContext";
