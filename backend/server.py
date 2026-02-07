@@ -537,6 +537,7 @@ app.include_router(phase14_engagement_router)  # Phase 14.5 routes
 app.include_router(phase14_communication_router)  # Phase 14.4 routes
 app.include_router(phase14_roles_router)  # Phase 14.3 routes
 app.include_router(phase14_hardening_router)  # Phase 14.7 routes
+app.include_router(phase15_pwa_router)  # Phase 15.1 routes - PWA
 
 # Mount static files for uploads
 from fastapi.staticfiles import StaticFiles
