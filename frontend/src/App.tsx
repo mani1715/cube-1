@@ -72,6 +72,8 @@ const App = () => (
           <Toaster />
           <Sonner />
           <CookieConsent />
+          <PWAInstallPrompt />
+          <PWAUpdatePrompt />
           <BrowserRouter>
             <UserProvider>
               <AdminProvider>
