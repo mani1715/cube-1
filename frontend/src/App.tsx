@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "./components/ThemeProvider";
 import CookieConsent from "./components/CookieConsent";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import PWAUpdatePrompt from "./components/PWAUpdatePrompt";
 import { lazy, Suspense } from "react";
 import LoadingSpinner from "./components/LoadingSpinner";
 
