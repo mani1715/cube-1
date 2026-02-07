@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ET
 import uuid
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://cube-genius-5.preview.emergentagent.com"
+BACKEND_URL = "https://cube-dashboard-2.preview.emergentagent.com"
 
 class Colors:
     GREEN = '\033[92m'
