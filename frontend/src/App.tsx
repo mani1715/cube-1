@@ -92,6 +92,7 @@ const App = () => (
                     <Route path="/terms" element={<Terms />} />
                     <Route path="/data-export" element={<DataExport />} />
                     <Route path="/account-deletion" element={<AccountDeletion />} />
+                    <Route path="/offline" element={<Offline />} />
             
                     {/* User Authentication Routes (Public) */}
                     <Route path="/login" element={<UserLogin />} />
