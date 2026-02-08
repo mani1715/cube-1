@@ -8,6 +8,7 @@ import { ThemeProvider } from "./components/ThemeProvider";
 import CookieConsent from "./components/CookieConsent";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAUpdatePrompt from "./components/PWAUpdatePrompt";
+import SkipNav from "./components/accessibility/SkipNav";
 import { lazy, Suspense } from "react";
 import LoadingSpinner from "./components/LoadingSpinner";
 
