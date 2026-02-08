@@ -127,11 +127,17 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 md:py-28">
+      <section 
+        className="py-20 md:py-28"
+        aria-labelledby="features-heading"
+      >
         <div className="container mx-auto px-4">
           <ScrollReveal>
             <div className="text-center mb-16">
-              <h2 className="font-display text-3xl md:text-4xl font-semibold text-foreground mb-4">
+              <h2 
+                id="features-heading"
+                className="font-display text-3xl md:text-4xl font-semibold text-foreground mb-4"
+              >
                 How We Support You
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -143,9 +149,9 @@ const Index = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
               <ScrollReveal key={index} delay={index * 100}>
-                <div className="group p-8 rounded-2xl gradient-card border border-border card-hover h-full">
+                <article className="group p-8 rounded-2xl gradient-card border border-border card-hover h-full">
                   <div className="w-14 h-14 rounded-xl gradient-accent flex items-center justify-center mb-6 group-hover:gradient-primary group-hover:scale-110 transition-all duration-300">
-                    <feature.icon className="w-6 h-6 text-primary group-hover:text-primary-foreground transition-colors" />
+                    <feature.icon className="w-6 h-6 text-primary group-hover:text-primary-foreground transition-colors" aria-hidden="true" />
                   </div>
                   <h3 className="font-display text-xl font-semibold text-foreground mb-3">
                     {feature.title}
@@ -153,7 +159,7 @@ const Index = () => {
                   <p className="text-muted-foreground text-sm leading-relaxed">
                     {feature.description}
                   </p>
-                </div>
+                </article>
               </ScrollReveal>
             ))}
           </div>
@@ -170,9 +176,12 @@ const Index = () => {
       <PrivacyHighlights />
 
       {/* CTA Section */}
-      <section className="py-20 md:py-28 gradient-cta relative overflow-hidden">
+      <section 
+        className="py-20 md:py-28 gradient-cta relative overflow-hidden"
+        aria-labelledby="cta-heading"
+      >
         {/* Decorative background */}
-        <div className="absolute inset-0 opacity-15">
+        <div className="absolute inset-0 opacity-15" aria-hidden="true">
           <div className="absolute top-0 left-0 w-64 h-64 rounded-full bg-white blur-3xl" />
           <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-white blur-3xl" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full bg-white/50 blur-3xl" />
@@ -180,8 +189,11 @@ const Index = () => {
         
         <div className="container mx-auto px-4 text-center relative z-10">
           <ScrollReveal>
-            <Heart className="w-12 h-12 text-primary-foreground/80 mx-auto mb-6 animate-float" />
-            <h2 className="font-display text-3xl md:text-4xl font-semibold text-primary-foreground mb-4">
+            <Heart className="w-12 h-12 text-primary-foreground/80 mx-auto mb-6 animate-float" aria-hidden="true" />
+            <h2 
+              id="cta-heading"
+              className="font-display text-3xl md:text-4xl font-semibold text-primary-foreground mb-4"
+            >
               Ready to Begin Your Healing Journey?
             </h2>
             <p className="text-primary-foreground/80 max-w-2xl mx-auto mb-8">
@@ -189,13 +201,23 @@ const Index = () => {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link to="/book-session">
-                <Button variant="secondary" size="lg" className="shadow-elevated hover:shadow-soft">
+                <Button 
+                  variant="secondary" 
+                  size="lg" 
+                  className="shadow-elevated hover:shadow-soft"
+                  aria-label="Book a therapy session"
+                >
                   Book a Session
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="w-5 h-5" aria-hidden="true" />
                 </Button>
               </Link>
               <Link to="/volunteer">
-                <Button variant="ghost" size="lg" className="text-primary-foreground border-2 border-primary-foreground/30 hover:bg-primary-foreground/10">
+                <Button 
+                  variant="ghost" 
+                  size="lg" 
+                  className="text-primary-foreground border-2 border-primary-foreground/30 hover:bg-primary-foreground/10"
+                  aria-label="Volunteer with us"
+                >
                   Volunteer With Us
                 </Button>
               </Link>
