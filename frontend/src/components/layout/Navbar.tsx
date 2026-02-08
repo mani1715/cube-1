@@ -168,12 +168,19 @@ export const Navbar = forwardRef<HTMLElement>((_, ref) => {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden py-4 border-t border-border animate-fade-in">
+          <div 
+            className="md:hidden py-4 border-t border-border animate-fade-in"
+            id="mobile-menu"
+            role="menu"
+            aria-label="Mobile navigation menu"
+          >
             <div className="flex flex-col gap-2">
               {navLinks.map((link, index) => (
                 <Link
                   key={link.path}
                   to={link.path}
+                  role="menuitem"
+                  aria-current={location.pathname === link.path ? "page" : undefined}
                   onClick={() => setIsOpen(false)}
                   className={`px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 animate-slide-in-up ${
                     location.pathname === link.path
@@ -194,19 +201,19 @@ export const Navbar = forwardRef<HTMLElement>((_, ref) => {
                 {/* Mobile User Section */}
                 {isAuthenticated && user ? (
                   <>
-                    <div className="px-4 py-2 mb-2">
+                    <div className="px-4 py-2 mb-2" role="status" aria-live="polite">
                       <p className="text-sm font-medium">{user.name}</p>
                       <p className="text-xs text-muted-foreground">{user.email}</p>
                     </div>
                     <Link to="/user/dashboard" onClick={() => setIsOpen(false)}>
-                      <Button variant="outline" className="w-full justify-start">
-                        <LayoutDashboard className="w-4 h-4 mr-2" />
+                      <Button variant="outline" className="w-full justify-start" aria-label="Go to dashboard">
+                        <LayoutDashboard className="w-4 h-4 mr-2" aria-hidden="true" />
                         Dashboard
                       </Button>
                     </Link>
                     <Link to="/user/profile" onClick={() => setIsOpen(false)}>
-                      <Button variant="outline" className="w-full justify-start">
-                        <User className="w-4 h-4 mr-2" />
+                      <Button variant="outline" className="w-full justify-start" aria-label="View profile">
+                        <User className="w-4 h-4 mr-2" aria-hidden="true" />
                         Profile
                       </Button>
                     </Link>
@@ -217,22 +224,23 @@ export const Navbar = forwardRef<HTMLElement>((_, ref) => {
                         setIsOpen(false);
                         handleLogout();
                       }}
+                      aria-label="Logout from account"
                     >
-                      <LogOut className="w-4 h-4 mr-2" />
+                      <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
                       Logout
                     </Button>
                   </>
                 ) : (
                   <>
                     <Link to="/login" onClick={() => setIsOpen(false)}>
-                      <Button variant="outline" className="w-full justify-start">
-                        <LogIn className="w-4 h-4 mr-2" />
+                      <Button variant="outline" className="w-full justify-start" aria-label="Login to your account">
+                        <LogIn className="w-4 h-4 mr-2" aria-hidden="true" />
                         Login
                       </Button>
                     </Link>
                     <Link to="/signup" onClick={() => setIsOpen(false)}>
-                      <Button variant="hero" className="w-full">
-                        <UserPlus className="w-4 h-4 mr-2" />
+                      <Button variant="hero" className="w-full" aria-label="Create new account">
+                        <UserPlus className="w-4 h-4 mr-2" aria-hidden="true" />
                         Sign Up
                       </Button>
                     </Link>
@@ -240,7 +248,7 @@ export const Navbar = forwardRef<HTMLElement>((_, ref) => {
                 )}
                 
                 <Link to="/volunteer" onClick={() => setIsOpen(false)}>
-                  <Button variant="outline" className="w-full">
+                  <Button variant="outline" className="w-full" aria-label="Become a volunteer">
                     Volunteer
                   </Button>
                 </Link>
