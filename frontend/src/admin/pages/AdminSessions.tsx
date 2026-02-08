@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { ButtonLoading } from '@/components/ui/button-loading';
+import { EnhancedEmptyState } from '@/components/ui/enhanced-empty-state';
+import { TableSkeleton, StatsCardSkeleton } from '@/components/ui/enhanced-skeleton';
+import { StatusIndicator } from '@/components/ui/status-indicator';
 import { adminSessionsAPI } from '@/lib/adminApi';
 import { toast } from 'sonner';
 
@@ -129,32 +133,36 @@ const AdminSessions = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-sm text-gray-600">Pending Sessions</p>
-            <p className="text-3xl font-bold text-yellow-600 mt-2">{stats.pending}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-sm text-gray-600">Confirmed Sessions</p>
-            <p className="text-3xl font-bold text-green-600 mt-2">{stats.confirmed}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-sm text-gray-600">Completed Sessions</p>
-            <p className="text-3xl font-bold text-blue-600 mt-2">{stats.completed}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-sm text-gray-600">Total Sessions</p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">{stats.total}</p>
-          </CardContent>
-        </Card>
-      </div>
+      {loading && sessions.length === 0 ? (
+        <StatsCardSkeleton count={4} />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 stagger-reveal">
+          <Card className="hover-lift">
+            <CardContent className="pt-6">
+              <p className="text-sm text-gray-600">Pending Sessions</p>
+              <p className="text-3xl font-bold text-yellow-600 mt-2">{stats.pending}</p>
+            </CardContent>
+          </Card>
+          <Card className="hover-lift">
+            <CardContent className="pt-6">
+              <p className="text-sm text-gray-600">Confirmed Sessions</p>
+              <p className="text-3xl font-bold text-green-600 mt-2">{stats.confirmed}</p>
+            </CardContent>
+          </Card>
+          <Card className="hover-lift">
+            <CardContent className="pt-6">
+              <p className="text-sm text-gray-600">Completed Sessions</p>
+              <p className="text-3xl font-bold text-blue-600 mt-2">{stats.completed}</p>
+            </CardContent>
+          </Card>
+          <Card className="hover-lift">
+            <CardContent className="pt-6">
+              <p className="text-sm text-gray-600">Total Sessions</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.total}</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Filters */}
       <Card>
@@ -216,20 +224,31 @@ const AdminSessions = () => {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-center py-8">
-              <p className="text-gray-600">Loading sessions...</p>
-            </div>
+            <TableSkeleton rows={5} />
           ) : error ? (
-            <div className="text-center py-8">
-              <p className="text-red-600">{error}</p>
-              <Button onClick={fetchSessions} className="mt-4">
-                Retry
-              </Button>
-            </div>
+            <EnhancedEmptyState
+              icon="file"
+              title="Failed to Load Sessions"
+              description={error}
+              action={{
+                label: 'Retry',
+                onClick: fetchSessions,
+              }}
+            />
           ) : sessions.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-600">No sessions found</p>
-            </div>
+            <EnhancedEmptyState
+              icon="calendar"
+              title="No Sessions Found"
+              description={
+                statusFilter === 'all'
+                  ? 'No session bookings have been created yet.'
+                  : `No ${statusFilter} sessions found. Try changing the filter.`
+              }
+              action={{
+                label: 'Clear Filters',
+                onClick: () => setStatusFilter('all'),
+              }}
+            />
           ) : (
             <>
               <div className="overflow-x-auto">
@@ -288,48 +307,54 @@ const AdminSessions = () => {
                           </div>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
-                          <span
-                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeColor(
-                              session.status
-                            )}`}
-                          >
-                            {session.status}
-                          </span>
+                          <StatusIndicator
+                            status={
+                              session.status === 'pending' ? 'pending' :
+                              session.status === 'confirmed' ? 'success' :
+                              session.status === 'completed' ? 'success' :
+                              'error'
+                            }
+                            label={session.status}
+                            size="sm"
+                          />
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm">
                           <div className="flex gap-2">
                             {session.status !== 'confirmed' && (
-                              <Button
+                              <ButtonLoading
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleStatusUpdate(session.id, 'confirmed')}
+                                loading={updatingId === session.id}
                                 disabled={updatingId === session.id}
-                                className="text-green-600 hover:text-green-700"
+                                className="text-green-600 hover:text-green-700 transition-all"
                               >
                                 Confirm
-                              </Button>
+                              </ButtonLoading>
                             )}
                             {session.status !== 'completed' && session.status !== 'cancelled' && (
-                              <Button
+                              <ButtonLoading
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleStatusUpdate(session.id, 'completed')}
+                                loading={updatingId === session.id}
                                 disabled={updatingId === session.id}
-                                className="text-blue-600 hover:text-blue-700"
+                                className="text-blue-600 hover:text-blue-700 transition-all"
                               >
                                 Complete
-                              </Button>
+                              </ButtonLoading>
                             )}
                             {session.status !== 'cancelled' && session.status !== 'completed' && (
-                              <Button
+                              <ButtonLoading
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleStatusUpdate(session.id, 'cancelled')}
+                                loading={updatingId === session.id}
                                 disabled={updatingId === session.id}
-                                className="text-red-600 hover:text-red-700"
+                                className="text-red-600 hover:text-red-700 transition-all"
                               >
                                 Cancel
-                              </Button>
+                              </ButtonLoading>
                             )}
                           </div>
                         </td>
