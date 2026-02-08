@@ -128,25 +128,29 @@ export const Footer = forwardRef<HTMLElement>((_, ref) => {
 
             <div>
               <h4 className="font-semibold text-foreground mb-4">Company</h4>
-              <ul className="space-y-2">
-                <li><Link to="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors">About Us</Link></li>
-                <li><Link to="/careers" className="text-sm text-muted-foreground hover:text-primary transition-colors">Careers</Link></li>
-                <li><Link to="/volunteer" className="text-sm text-muted-foreground hover:text-primary transition-colors">Volunteer</Link></li>
-                <li><Link to="/blogs" className="text-sm text-muted-foreground hover:text-primary transition-colors">Blog</Link></li>
-              </ul>
+              <nav aria-label="Company navigation">
+                <ul className="space-y-2">
+                  <li><Link to="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors">About Us</Link></li>
+                  <li><Link to="/careers" className="text-sm text-muted-foreground hover:text-primary transition-colors">Careers</Link></li>
+                  <li><Link to="/volunteer" className="text-sm text-muted-foreground hover:text-primary transition-colors">Volunteer</Link></li>
+                  <li><Link to="/blogs" className="text-sm text-muted-foreground hover:text-primary transition-colors">Blog</Link></li>
+                </ul>
+              </nav>
             </div>
 
             <div>
               <h4 className="font-semibold text-foreground mb-4">Legal</h4>
-              <ul className="space-y-2">
-                <li><Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link></li>
-                <li><Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">Terms & Conditions</Link></li>
-              </ul>
+              <nav aria-label="Legal navigation">
+                <ul className="space-y-2">
+                  <li><Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link></li>
+                  <li><Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">Terms & Conditions</Link></li>
+                </ul>
+              </nav>
             </div>
           </div>
 
           <div className="border-t border-border mt-12 pt-8 text-center">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground" role="contentinfo">
               © {new Date().getFullYear()} A-Cube. All rights reserved.
             </p>
           </div>
