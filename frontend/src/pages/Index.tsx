@@ -47,56 +47,71 @@ const Index = () => {
         description="A-Cube Mental Health Platform - Professional therapy services, licensed psychologists, and wellness programs. Book your therapy session today and start your journey to mental wellness."
         keywords={['mental health services', 'online therapy', 'licensed psychologists', 'counseling', 'therapy sessions', 'mental wellness', 'group therapy', 'individual therapy']}
       />
-      {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${heroBg})` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-background/70 to-transparent" />
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full gradient-accent text-primary text-sm font-medium mb-6 animate-fade-up opacity-0" style={{ animationDelay: "0s", animationFillMode: "forwards" }}>
-              <Sparkles className="w-4 h-4" />
-              Compassionate Mental Health Care
-            </div>
-            
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground mb-6 animate-fade-up opacity-0" style={{ animationDelay: "0.1s", animationFillMode: "forwards" }}>
-              Your Journey to
-              <span className="text-gradient block mt-2">Mental Wellness</span>
-              Starts Here
-            </h1>
-            
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl animate-fade-up opacity-0" style={{ animationDelay: "0.2s", animationFillMode: "forwards" }}>
-              We provide compassionate therapy, transformative events, and a supportive community to help you thrive. Take the first step towards a healthier mind.
-            </p>
-            
-            <div className="flex flex-wrap gap-4 animate-fade-up opacity-0" style={{ animationDelay: "0.3s", animationFillMode: "forwards" }}>
-              <Link to="/services">
-                <Button variant="hero" size="lg">
-                  Explore Services
-                  <ArrowRight className="w-5 h-5" />
-                </Button>
-              </Link>
-              <Link to="/events">
-                <Button variant="outline" size="lg">
-                  Upcoming Events
-                </Button>
-              </Link>
+      {/* Main Content */}
+      <main id="main-content">
+        {/* Hero Section */}
+        <section 
+          className="relative min-h-[90vh] flex items-center overflow-hidden"
+          aria-labelledby="hero-heading"
+        >
+          <div 
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${heroBg})` }}
+            role="img"
+            aria-label="Background image showing peaceful mental wellness"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-background/70 to-transparent" />
+          
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-3xl">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full gradient-accent text-primary text-sm font-medium mb-6 animate-fade-up opacity-0" style={{ animationDelay: "0s", animationFillMode: "forwards" }}>
+                <Sparkles className="w-4 h-4" aria-hidden="true" />
+                Compassionate Mental Health Care
+              </div>
+              
+              <h1 
+                id="hero-heading"
+                className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground mb-6 animate-fade-up opacity-0" 
+                style={{ animationDelay: "0.1s", animationFillMode: "forwards" }}
+              >
+                Your Journey to
+                <span className="text-gradient block mt-2">Mental Wellness</span>
+                Starts Here
+              </h1>
+              
+              <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl animate-fade-up opacity-0" style={{ animationDelay: "0.2s", animationFillMode: "forwards" }}>
+                We provide compassionate therapy, transformative events, and a supportive community to help you thrive. Take the first step towards a healthier mind.
+              </p>
+              
+              <div className="flex flex-wrap gap-4 animate-fade-up opacity-0" style={{ animationDelay: "0.3s", animationFillMode: "forwards" }}>
+                <Link to="/services">
+                  <Button variant="hero" size="lg" aria-label="Explore our therapy services">
+                    Explore Services
+                    <ArrowRight className="w-5 h-5" aria-hidden="true" />
+                  </Button>
+                </Link>
+                <Link to="/events">
+                  <Button variant="outline" size="lg" aria-label="View upcoming events">
+                    Upcoming Events
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Floating decorative elements */}
-        <div className="absolute right-10 top-1/4 w-32 h-32 rounded-full bg-primary/10 blur-3xl animate-float" />
-        <div className="absolute right-1/4 bottom-1/4 w-48 h-48 rounded-full bg-accent/40 blur-3xl animate-float" style={{ animationDelay: "2s" }} />
-      </section>
+          {/* Floating decorative elements */}
+          <div className="absolute right-10 top-1/4 w-32 h-32 rounded-full bg-primary/10 blur-3xl animate-float" aria-hidden="true" />
+          <div className="absolute right-1/4 bottom-1/4 w-48 h-48 rounded-full bg-accent/40 blur-3xl animate-float" style={{ animationDelay: "2s" }} aria-hidden="true" />
+        </section>
 
-      {/* Stats Section */}
-      <section className="py-16 gradient-card border-y border-border">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        {/* Stats Section */}
+        <section 
+          className="py-16 gradient-card border-y border-border"
+          aria-labelledby="stats-heading"
+        >
+          <h2 id="stats-heading" className="sr-only">Our Impact Statistics</h2>
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <ScrollReveal key={index} delay={index * 100}>
                 <div className="text-center">
