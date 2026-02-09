@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ET
 import uuid
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://cube-wizard-10.preview.emergentagent.com"
+BACKEND_URL = "https://rubiks-hub-2.preview.emergentagent.com"
 
 class Colors:
     GREEN = '\033[92m'
