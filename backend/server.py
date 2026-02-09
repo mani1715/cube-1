@@ -518,6 +518,7 @@ from api.phase14_communication import router as phase14_communication_router  # 
 from api.phase14_roles import router as phase14_roles_router  # Phase 14.3 - Role Expansion
 from api.phase14_hardening import router as phase14_hardening_router  # Phase 14.7 - Hardening
 from api.phase15_pwa import router as phase15_pwa_router  # Phase 15.1 - PWA
+from api.phase15_router import router as phase15_router  # Phase 15.2 - Mobile & Push Notifications
 app.include_router(admin_router)
 app.include_router(auth_router)
 app.include_router(bulk_router)
