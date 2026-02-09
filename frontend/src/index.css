@@ -4,6 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile Touch-Optimized Styles */
+@import './components/mobile/MobileTouchOptimized.css';
+
 @layer base {
   :root {
     /* Calming mental health palette with Orange accent */
