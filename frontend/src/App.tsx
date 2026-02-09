@@ -74,6 +74,7 @@ const App = () => (
         <TooltipProvider>
           <SkipNav />
           <NetworkStatus />
+          <MobileStickyCTA showAfterScroll={400} dismissable={true} />
           <Toaster />
           <Sonner />
           <CookieConsent />
