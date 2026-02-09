@@ -9,6 +9,7 @@ import CookieConsent from "./components/CookieConsent";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAUpdatePrompt from "./components/PWAUpdatePrompt";
 import SkipNav from "./components/accessibility/SkipNav";
+import { NetworkStatus } from "./components/ui/network-status";
 import { lazy, Suspense } from "react";
 import LoadingSpinner from "./components/LoadingSpinner";
 
@@ -71,6 +72,7 @@ const App = () => (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <SkipNav />
+          <NetworkStatus />
           <Toaster />
           <Sonner />
           <CookieConsent />
