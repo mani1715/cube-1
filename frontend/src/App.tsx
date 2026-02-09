@@ -10,6 +10,7 @@ import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAUpdatePrompt from "./components/PWAUpdatePrompt";
 import SkipNav from "./components/accessibility/SkipNav";
 import { NetworkStatus } from "./components/ui/network-status";
+import { MobileStickyCTA } from "./components/mobile/MobileStickyCTA";
 import { lazy, Suspense } from "react";
 import LoadingSpinner from "./components/LoadingSpinner";
 
